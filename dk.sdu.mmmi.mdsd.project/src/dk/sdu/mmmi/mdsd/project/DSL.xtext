@@ -1,0 +1,135 @@
+grammar dk.sdu.mmmi.mdsd.project.DSL with org.eclipse.xtext.common.Terminals
+
+generate dSL "http://www.sdu.dk/mmmi/mdsd/project/DSL"
+
+Production:
+	'production' name=ID items+=ProductionItem+
+;
+
+ProductionItem:
+	Area | TerminatableDef | Task | Robot
+;
+
+Area:
+	'area' name=ID 'size' size=Vector2 items+=AreaItem* 'endarea'
+;
+
+Vector2:
+	x=INT y=INT
+;
+
+AreaItem:
+	Shelf | Obstacle
+;
+
+Shelf:
+	'shelf' name=ID 'pos' pos=Vector2 properties+=Property* 'endshelf'
+;
+
+Obstacle:
+	'obstacle' name=ID 'pos' pos=Vector2 'size' size=Vector2 'endobstacle'
+;
+
+Property:
+	'property' name=ID 'default' default=INT
+;
+
+TerminatableDef:
+	'terminatable' terms+=Terminatable (',' terms+=Terminatable)*
+;
+
+Terminatable:
+	name=ID
+;
+
+Task:
+	'task' name=ID items+=TaskItem* 'endtask'
+;
+
+TaskItem:
+	Action | Condition
+;
+
+Action:
+	{Pickup} 'pickup' 
+	| {ForwardUntil} 'forward' 'until' shelf=[Shelf]
+	| {Forward} 'forward' amount=INT
+	| {Backward} 'backward' amount=INT
+	| {Turn} 'turn' direction=Direction
+	| {Retry} 'retry'
+	| {DoTask} 'do' task=[Task]
+	| Terminate
+;
+
+Direction:
+	{LeftDir} 'left' | {RightDir} 'right'
+;
+
+Terminate:
+	'terminate' name=[Terminatable]
+;
+
+Condition:
+	'if' state=State tasks+=TaskItem* else=Else? 'endif'
+;
+
+State:
+	{StateAt} 'at' shelf=[Shelf]
+	| left=Exp sign=Sign right=Exp
+;
+
+Else:
+	{Else} 'else' tasks+=TaskItem*
+;
+
+Sign:
+	{Equals} '='
+	| {SmallerThan} '<'
+	| {GreaterThan} '>'
+	| {SmallerThanEquals} '<='
+	| {GreaterThanEquals} '>='
+;
+
+Exp returns Expression:
+	Factor (('+' {Plus.left = current} | '-' {Minus.left = current}) right=Factor)* 
+;
+
+Factor returns Expression:
+	Primary (('*' {Mult.left = current} | '/' {Div.left = current}) right=Primary)*
+;
+
+Primary returns Expression:
+	Number | Parentheses | StateVars
+;
+
+Parentheses returns Expression:
+	'(' Exp ')'
+;
+
+Number returns Expression:
+	{Num} value=INT
+;
+
+StateVars returns Expression:
+	({StatePickedUp} 'pickedUp' prop=[Property] | {StateRetries} 'retries')
+;
+
+Robot:
+	'robot' name=ID 'in' area=[Area] startpoint=StartPoint mission=Mission 'endrobot'
+;
+
+StartPoint:
+	'startpoint' pos=Vector2
+;
+
+Mission:
+	{Mission} 'mission' tasks+=MissionTask* 'endmission'
+;
+
+MissionTask:
+	task=[Task] ('terminated' '{' terminated=TaskTerminated '}')?
+;
+
+TaskTerminated:
+	terminatable=[Terminatable] '{' items+=TaskItem* '}'
+;
