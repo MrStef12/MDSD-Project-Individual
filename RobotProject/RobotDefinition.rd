@@ -11,6 +11,8 @@ area ProductionFloor size 100 100
 	endshelf
 endarea
 
+terminatable WeightTooHigh
+
 task goToShelf
 	forward 20
 	if at MyShelf
@@ -20,3 +22,30 @@ task goToShelf
 		turn right
 	endif
 endtask
+
+task driveShelf
+	pickup
+	if pickedUp PhysicalWeight + 20 < 130
+		turn left
+		backward 20
+	else
+		terminate WeightTooHigh
+	endif
+endtask
+
+robot Rob1 in ProductionFloor
+	startpoint 20 10
+	mission
+		goToShelf terminated {
+			WeightTooHigh {
+				if retries < 100
+					retry
+				else
+					do goToShelf
+				endif
+				// other things
+			}
+			// other terminatables
+		}
+	endmission
+endrobot
