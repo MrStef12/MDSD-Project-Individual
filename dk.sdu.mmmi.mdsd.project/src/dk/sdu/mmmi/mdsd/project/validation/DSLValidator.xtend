@@ -9,6 +9,7 @@ import org.eclipse.xtext.validation.IResourceValidator
 import javax.inject.Inject
 import org.eclipse.emf.ecore.resource.Resource
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
@@ -30,18 +31,19 @@ class DSLValidator extends AbstractDSLValidator {
 
 	public static val INVALID_NAME = 'Invalid name 2 objects with same name';
 	
+	@Check(FAST)
 	def checkNames(Shelf s) {
 		val container = EcoreUtil2.getRootContainer(s);
 		val cand = EcoreUtil2.getAllContentsOfType(container, Shelf);
 		
 		for (Shelf myS : cand) {
-			if (s.name.equals(myS.name)) {
-				warning(INVALID_NAME,  DSLPackage.Literals.);
-			}
-		}
-		
-		if () {
 			
+			if (s != myS) {
+				if (s.name.equals(myS.name)) {
+					warning(INVALID_NAME,  DSLPackage.Literals.AREA_ITEM__NAME);
+				}
+			}
+
 		}
 	}
 	
