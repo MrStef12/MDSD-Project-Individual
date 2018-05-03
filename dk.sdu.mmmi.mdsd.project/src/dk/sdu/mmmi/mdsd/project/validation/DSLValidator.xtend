@@ -5,9 +5,6 @@ package dk.sdu.mmmi.mdsd.project.validation
 
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
 import org.eclipse.xtext.EcoreUtil2
-import org.eclipse.xtext.validation.IResourceValidator
-import javax.inject.Inject
-import org.eclipse.emf.ecore.resource.Resource
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage
 import org.eclipse.xtext.validation.Check
 
@@ -18,16 +15,6 @@ import org.eclipse.xtext.validation.Check
  */
 class DSLValidator extends AbstractDSLValidator {
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					DSLPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
 
 	public static val INVALID_NAME = 'Invalid name 2 objects with same name';
 	

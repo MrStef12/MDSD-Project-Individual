@@ -30,14 +30,6 @@ class DSLScopeProvider extends AbstractDSLScopeProvider {
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Shelf)
 			return Scopes.scopeFor(candidates)
 		}
-		/*
-		if (
-			(context instanceof StatePickedUp && reference == Literals.STATE_PICKED_UP__PROP)
-		) {
-			val rootElement = EcoreUtil2.getRootContainer(context)
-			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Property)
-			return Scopes.scopeFor(candidates)
-		} */
 		return super.getScope(context, reference)
 	}	
 }
