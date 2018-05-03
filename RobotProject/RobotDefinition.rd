@@ -5,9 +5,15 @@ area ProductionFloor size 100 100
 		pos 2 2
 		size 1 1
 	endobstacle
-	shelf MyShelf
+	shelf TestShelf
 		pos 20 20
 		property PhysicalWeight default 100
+	endshelf
+endarea
+
+area ProdFloor2 size 100 100
+	shelf TestShelf
+		pos 20 20
 	endshelf
 endarea
 
@@ -15,7 +21,7 @@ terminatable WeightTooHigh
 
 task goToShelf
 	forward 20
-	if at MyShelf
+	if at TestShelf
 		turn left
 		backward 10
 	else
@@ -25,7 +31,7 @@ endtask
 
 task driveShelf
 	pickup
-	if pickedUp PhysicalWeight + 20 < 130
+	if pickedUp ProductionFloor.TestShelf.PhysicalWeight + 20 < 130
 		turn left
 		backward 20
 	else

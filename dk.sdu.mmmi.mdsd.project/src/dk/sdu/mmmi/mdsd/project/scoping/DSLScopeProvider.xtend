@@ -3,6 +3,16 @@
  */
 package dk.sdu.mmmi.mdsd.project.scoping
 
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import dk.sdu.mmmi.mdsd.project.dSL.StateAt
+import org.eclipse.xtext.EcoreUtil2
+import dk.sdu.mmmi.mdsd.project.dSL.Shelf
+import org.eclipse.xtext.scoping.Scopes
+import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
+import dk.sdu.mmmi.mdsd.project.dSL.ForwardUntil
+import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
+import dk.sdu.mmmi.mdsd.project.dSL.Property
 
 /**
  * This class contains custom scoping description.
@@ -11,5 +21,23 @@ package dk.sdu.mmmi.mdsd.project.scoping
  * on how and when to use it.
  */
 class DSLScopeProvider extends AbstractDSLScopeProvider {
-
+	override getScope(EObject context, EReference reference) {
+		if(
+			(context instanceof StateAt && reference == Literals.STATE_AT__SHELF) ||
+			(context instanceof ForwardUntil && reference == Literals.FORWARD_UNTIL__SHELF)
+		) {
+			val rootElement = EcoreUtil2.getRootContainer(context)
+			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Shelf)
+			return Scopes.scopeFor(candidates)
+		}
+		/*
+		if (
+			(context instanceof StatePickedUp && reference == Literals.STATE_PICKED_UP__PROP)
+		) {
+			val rootElement = EcoreUtil2.getRootContainer(context)
+			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Property)
+			return Scopes.scopeFor(candidates)
+		} */
+		return super.getScope(context, reference)
+	}	
 }
