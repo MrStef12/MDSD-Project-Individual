@@ -24,7 +24,59 @@ class ModelGenerator {
 		fsa.generateFile('Shelf.java', shelfModel)
 		fsa.generateFile('Vector.java', vectorModel)
 		fsa.generateFile('Property.java', PropertyModel)
-		fsa.generateFile('Obstacle.java', ObstacleModel);
+		fsa.generateFile('Obstacle.java', ObstacleModel)
+		fsa.generateFile('Robot.java', RobotModel)
+		fsa.generateFile('Mission.java', MissionModel)
+	}
+	
+	def MissionModel() {
+		'''
+		public class Mission {
+		    private List<Task> mission;
+		    private int currentTask;
+		    
+		    public Mission() {
+		        currentTask = 0;
+		    }
+		    
+		    public Task getNextTask() {
+		        Task t = mission.get(currentTask);
+		        currentTask++;
+		        return t;
+		    }
+		    
+		}
+		'''
+	}
+	
+	def RobotModel() {
+		'''
+		public class Robot {
+		    private String name;
+		    private Vector2 startpoint;
+		    private Mission mission;
+		
+		    public Robot(String name, Vector2 startpoint, Mission mission) {
+		        this.name = name;
+		        this.startpoint = startpoint;
+		        this.mission = mission;
+		    }
+		
+		    public String getName() {
+		        return name;
+		    }
+		
+		    public Vector2 getStartpoint() {
+		        return startpoint;
+		    }
+		
+		    public Mission getMission() {
+		        return mission;
+		    }
+		    
+		    
+		}
+		'''
 	}
 	
 	def ObstacleModel() {

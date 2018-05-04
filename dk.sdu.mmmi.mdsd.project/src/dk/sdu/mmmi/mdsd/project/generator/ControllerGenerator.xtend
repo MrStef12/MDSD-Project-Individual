@@ -24,12 +24,12 @@ class ControllerGenerator {
 		var areas = resource.allContents.filter(Area).toList;
 		
 		for (Area area : areas) {
-			fsa.generateFile( area.name + 'Controller.java', generateController(area.items) );
+			fsa.generateFile( area.name + 'Controller.java', generateController(area) );
 		}
 		
 	}
 	
-	def generateController(EList<AreaItem> items) {
+	def generateController(Area area) {
 		
 		//for (Shelf s : items.filter(Shelf))
 		
@@ -45,15 +45,12 @@ class ControllerGenerator {
 		import javafx.scene.input.MouseEvent;
 		import javafx.scene.layout.GridPane;
 		
-		public class FXMLDocumentController implements Initializable {
+		public class «area.name»Controller implements Initializable {
 		    
 		    @FXML
 		    private GridPane grid;
-		    @FXML
-		    private Label Robot;
 		    
 		    private Map<String, Label> robots;
-		    Label l = new Label("Robot");
 		
 		    
 		    @Override
