@@ -12,4 +12,5 @@ class DSLStandaloneSetup extends DSLStandaloneSetupGenerated {
 	def static void doSetup() {
 		new DSLStandaloneSetup().createInjectorAndDoEMFRegistration()
 	}
+	
 }
