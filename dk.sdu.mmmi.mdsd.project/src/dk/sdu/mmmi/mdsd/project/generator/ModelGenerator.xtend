@@ -51,49 +51,54 @@ class ModelGenerator {
 	
 	def RobotModel() {
 		'''
-		public class Robot {
-		    private String name;
-		    private Vector2 startpoint;
+		import javafx.scene.control.Label;
+		
+		public class Robot extends Label {
+		    private Vector2 pos;
 		    private Mission mission;
 		
 		    public Robot(String name, Vector2 startpoint, Mission mission) {
-		        this.name = name;
-		        this.startpoint = startpoint;
+		        super(name);
+		        this.pos = startpoint;
 		        this.mission = mission;
 		    }
 		
 		    public String getName() {
-		        return name;
+		        return this.textProperty().toString();
 		    }
-		
-		    public Vector2 getStartpoint() {
-		        return startpoint;
+		    
+		    public Vector2 getPos() {
+		        return pos;
 		    }
 		
 		    public Mission getMission() {
 		        return mission;
 		    }
 		    
-		    
+		    public void execute() {
+		        Task t = mission.getNextTask();
+		        
+		    }
 		}
 		'''
 	}
 	
 	def ObstacleModel() {
 		'''
-		public class Obstacle {
-		    private String name;
+		import javafx.scene.control.Label;
+		
+		public class Obstacle extends Label {
 		    private Vector2 pos;
 		    private Vector2 size;
 		
 		    public Obstacle(String name, Vector2 pos, Vector2 size) {
-		        this.name = name;
+		        super(name);
 		        this.pos = pos;
 		        this.size = size;
 		    }
 		
 		    public String getName() {
-		        return name;
+		        return this.getText();
 		    }
 		
 		    public Vector2 getPos() {
