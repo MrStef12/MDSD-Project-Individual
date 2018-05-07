@@ -27,14 +27,14 @@ class ControllerGenerator {
 		var areas = resource.allContents.filter(Area).toList;
 		
 		for (Area area : areas) {
-			fsa.generateFile( area.name + 'Controller.java', generateController(area) );
+			fsa.generateFile('/src/robotdefinitionsample/' + area.name + 'Controller.java', generateController(area) );
 		}
 		
 	}
 	
 	def generateController(Area area) {
 		
-		//«»
+		//ï¿½ï¿½
 		
 		'''
 		import java.net.URL;
@@ -47,7 +47,7 @@ class ControllerGenerator {
 		import javafx.scene.input.MouseEvent;
 		import javafx.scene.layout.GridPane;
 		
-		public class «area.name»Controller implements Initializable {
+		public class Â«area.nameÂ»Controller implements Initializable {
 		    
 		    @FXML
 		    private GridPane grid;
@@ -63,8 +63,8 @@ class ControllerGenerator {
 				obstacles = new ArrayList<>();
 				shelfs = new ArrayList<>();
 		
-		        «robots(area.name)»
-		        «generateItems(area.items)»
+				Â«robots(area.name)Â»
+		        Â«generateItems(area.items)Â»
 		        
 		    }
 		
@@ -100,42 +100,44 @@ class ControllerGenerator {
 		].toList
 		
 		'''
-		«instanciateObjects(robots)»
+		Â«instanciateObjects(robots)Â»
+		
 		'''
 		
 	}
 	
 	def generateItems(List<AreaItem> items) {
 		'''
-		«FOR i : items»
-		«construct(i)»
-		«ENDFOR»
+		Â«FOR i : itemsÂ»
+		Â«construct(i)Â»
+		Â«ENDFORÂ»
 		'''
 	}
 	
 	def instanciateObjects(List<EObject> objects) {
 		'''
-		«FOR r : objects»
-		«construct(r)»
-		«ENDFOR»
+		Â«FOR i : objectsÂ»
+		Â«construct(i)Â»
+		Â«ENDFORÂ»
 		'''
 	}
 	
 	def dispatch construct(Robot r) {
 		'''
-		Robot R«r.name» = new Robot(«r.name», new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
+		Â«Â»
+		Robot R Â«r.nameÂ» = new Robot(Â«r.nameÂ», new Vector2(Â«r.startpoint.pos.xÂ», Â«r.startpoint.pos.yÂ»));
 		'''
 	}
 	
 	def dispatch construct(Shelf s) {
 		'''
-		Shelf S«s.name» = new Shelf(«s.name», new Vector2(«s.pos.x», «s.pos.y»));
+		Shelf SÂ«s.nameÂ» = new Shelf(Â«s.nameÂ», new Vector2(Â«s.pos.xÂ», Â«s.pos.yÂ»));
 		'''
 	}
 	
 	def dispatch construct(Obstacle o) {
 		'''
-		Obstacle O«o.name» = new Obstacle(«o.name», new Vector2(«o.pos.x», «o.pos.y»), new Vector2(«o.size.x», «o.size.y»));
+		Obstacle OÂ«o.nameÂ» = new Obstacle(Â«o.nameÂ», new Vector2(Â«o.pos.xÂ», Â«o.pos.yÂ»), new Vector2(Â«o.size.xÂ», Â«o.size.yÂ»));
 		'''
 	}
 	

@@ -32,7 +32,7 @@ class DSLGenerator extends AbstractGenerator {
 		new GUIGenerator(resource, fsa, context);
 		new ControllerGenerator(resource, fsa, context);
 		new ModelGenerator(resource, fsa, context);
-		
+		new ProjectGenerator(resource, fsa, context);
 		
 	}
 	

@@ -26,14 +26,14 @@ class GUIGenerator {
 		var areas = resource.allContents.filter(Area).toList;
 		
 		for (Area area : areas) {
-			fsa.generateFile( area.name + '.fxml', generateFxmlText(area.size.x, area.size.y));
+			fsa.generateFile('/src/robotdefinitionsample/' + area.name + '.fxml', generateFxmlText(area.size.x, area.size.y));
 		}
 		
 	}
 	
 	def generateFxmlText(int x, int y) {
 		
-		// «»
+		// ï¿½ï¿½
 		
 		'''
 		<?xml version="1.0" encoding="UTF-8"?>
@@ -46,10 +46,10 @@ class GUIGenerator {
 		   <children>
 		      <GridPane gridLinesVisible="true" layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
 		        <columnConstraints>
-		        	«generateCol(x)»
+		        	Â«generateCol(x)Â»
 		        </columnConstraints>
 		        <rowConstraints>
-		        	«generateRow(y)»
+		        	Â«generateRow(y)Â»
 		        </rowConstraints>
 		      </GridPane>
 		   </children>

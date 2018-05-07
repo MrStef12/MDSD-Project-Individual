@@ -21,16 +21,21 @@ class ModelGenerator {
 	}
 	
 	def generateModels(IFileSystemAccess2 fsa, Resource resource) {
-		fsa.generateFile('Shelf.java', shelfModel)
-		fsa.generateFile('Vector.java', vectorModel)
-		fsa.generateFile('Property.java', PropertyModel)
-		fsa.generateFile('Obstacle.java', ObstacleModel)
-		fsa.generateFile('Robot.java', RobotModel)
-		fsa.generateFile('Mission.java', MissionModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Shelf.java', shelfModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Vector2.java', vectorModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Property.java', PropertyModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Obstacle.java', ObstacleModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Robot.java', RobotModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Mission.java', MissionModel)
 	}
 	
 	def MissionModel() {
 		'''
+		package robotdefinitionsample.models;
+		
+		import java.util.ArrayList;
+		import java.util.List;
+		
 		public class Mission {
 		    private List<Task> mission;
 		    private int currentTask;
@@ -51,20 +56,25 @@ class ModelGenerator {
 	
 	def RobotModel() {
 		'''
+		package robotdefinitionsample.models;
+		
 		import javafx.scene.control.Label;
 		
 		public class Robot extends Label {
 		    private Vector2 pos;
 		    private Mission mission;
 		
-		    public Robot(String name, Vector2 startpoint, Mission mission) {
+		    public Robot(String name, Vector2 startpoint) {
 		        super(name);
 		        this.pos = startpoint;
-		        this.mission = mission;
+		    }
+		    
+		    public void setMission(Mission m) {
+		        this.mission = m;
 		    }
 		
 		    public String getName() {
-		        return this.textProperty().toString();
+		        return this.getText();
 		    }
 		    
 		    public Vector2 getPos() {
@@ -77,7 +87,7 @@ class ModelGenerator {
 		    
 		    public void execute() {
 		        Task t = mission.getNextTask();
-		        
+		        t.executeTaskItem();
 		    }
 		}
 		'''
@@ -85,6 +95,8 @@ class ModelGenerator {
 	
 	def ObstacleModel() {
 		'''
+		package robotdefinitionsample.models;
+		
 		import javafx.scene.control.Label;
 		
 		public class Obstacle extends Label {
@@ -116,6 +128,8 @@ class ModelGenerator {
 	
 	def PropertyModel() {
 		'''
+		package robotdefinitionsample.models;
+		
 		public class Property {
 		    private String name;
 		    private int _default;
@@ -138,6 +152,9 @@ class ModelGenerator {
 	
 	def vectorModel() {
 		'''
+		
+		package robotdefinitionsample.models;
+		
 		public class Vector2 {
 		    private int x;
 		    private int y;
@@ -154,6 +171,14 @@ class ModelGenerator {
 		    public int getY() {
 		        return y;
 		    }
+		    
+		    public void setY(int y) {
+		        this.y = y;
+		    }
+		    
+		    public void setX(int x) {
+		        this.x = x;
+		    }
 		}
 		'''
 	}
@@ -162,6 +187,12 @@ class ModelGenerator {
 	
 	def shelfModel() {
 		'''
+		package robotdefinitionsample.models;
+		
+		import java.util.HashMap;
+		import java.util.Map;
+		import javafx.scene.control.Label;
+		
 		public class Shelf {
 		    private String name;
 		    private Vector2 pos;
