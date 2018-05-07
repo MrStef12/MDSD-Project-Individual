@@ -34,7 +34,7 @@ class ControllerGenerator {
 	
 	def generateController(Area area) {
 		
-		//Â«Â»
+		//«»
 		
 		'''
 		import java.net.URL;
@@ -47,7 +47,7 @@ class ControllerGenerator {
 		import javafx.scene.input.MouseEvent;
 		import javafx.scene.layout.GridPane;
 		
-		public class Â«area.nameÂ»Controller implements Initializable {
+		public class «area.name»Controller implements Initializable {
 		    
 		    @FXML
 		    private GridPane grid;
@@ -63,8 +63,8 @@ class ControllerGenerator {
 				obstacles = new ArrayList<>();
 				shelfs = new ArrayList<>();
 		
-		        Â«robots(area.name)Â»
-		        Â«generateItems(area.items)Â»
+		        «robots(area.name)»
+		        «generateItems(area.items)»
 		        
 		    }
 		
@@ -100,42 +100,42 @@ class ControllerGenerator {
 		].toList
 		
 		'''
-		Â«instanciateObjects(robots)Â»
+		«instanciateObjects(robots)»
 		'''
 		
 	}
 	
 	def generateItems(List<AreaItem> items) {
 		'''
-		Â«FOR i : itemsÂ»
-		Â«construct(i)Â»
-		Â«ENDFORÂ»
+		«FOR i : items»
+		«construct(i)»
+		«ENDFOR»
 		'''
 	}
 	
 	def instanciateObjects(List<EObject> objects) {
 		'''
-		Â«FOR r : objectsÂ»
-		Â«construct(r)Â»
-		Â«ENDFORÂ»
+		«FOR r : objects»
+		«construct(r)»
+		«ENDFOR»
 		'''
 	}
 	
 	def dispatch construct(Robot r) {
 		'''
-		Robot RÂ«r.nameÂ» = new Robot(Â«r.nameÂ», new Vector2(Â«r.startpoint.pos.xÂ», Â«r.startpoint.pos.yÂ»));
+		Robot R«r.name» = new Robot(«r.name», new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
 		'''
 	}
 	
 	def dispatch construct(Shelf s) {
 		'''
-		Shelf SÂ«s.nameÂ» = new Shelf(Â«s.nameÂ», new Vector2(Â«s.pos.xÂ», Â«s.pos.yÂ»));
+		Shelf S«s.name» = new Shelf(«s.name», new Vector2(«s.pos.x», «s.pos.y»));
 		'''
 	}
 	
 	def dispatch construct(Obstacle o) {
 		'''
-		Obstacle OÂ«o.nameÂ» = new Obstacle(Â«o.nameÂ», new Vector2(Â«o.pos.xÂ», Â«o.pos.yÂ»), new Vector2(Â«o.size.xÂ», Â«o.size.yÂ»));
+		Obstacle O«o.name» = new Obstacle(«o.name», new Vector2(«o.pos.x», «o.pos.y»), new Vector2(«o.size.x», «o.size.y»));
 		'''
 	}
 	

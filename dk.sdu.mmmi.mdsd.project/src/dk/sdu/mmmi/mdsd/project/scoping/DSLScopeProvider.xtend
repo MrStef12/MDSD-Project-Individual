@@ -3,16 +3,14 @@
  */
 package dk.sdu.mmmi.mdsd.project.scoping
 
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.ecore.EReference
-import dk.sdu.mmmi.mdsd.project.dSL.StateAt
-import org.eclipse.xtext.EcoreUtil2
-import dk.sdu.mmmi.mdsd.project.dSL.Shelf
-import org.eclipse.xtext.scoping.Scopes
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
 import dk.sdu.mmmi.mdsd.project.dSL.ForwardUntil
-import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
-import dk.sdu.mmmi.mdsd.project.dSL.Property
+import dk.sdu.mmmi.mdsd.project.dSL.Shelf
+import dk.sdu.mmmi.mdsd.project.dSL.StateAt
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.scoping.Scopes
 
 /**
  * This class contains custom scoping description.

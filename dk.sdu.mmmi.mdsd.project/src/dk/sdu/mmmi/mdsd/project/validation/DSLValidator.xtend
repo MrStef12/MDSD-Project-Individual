@@ -4,6 +4,7 @@
 package dk.sdu.mmmi.mdsd.project.validation
 
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
+import dk.sdu.mmmi.mdsd.project.dSL.Property
 import org.eclipse.xtext.EcoreUtil2
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage
 import org.eclipse.xtext.validation.Check
@@ -31,6 +32,22 @@ class DSLValidator extends AbstractDSLValidator {
 				}
 			}
 
+		}
+	}
+	
+	public static val INVALID_PROPERTY_NAME = 'Invalid property name 2 properties with same name';
+	
+	@Check(FAST)
+	def checkProperty(Property p) {
+		val container = EcoreUtil2.getRootContainer(p);
+		val cand = EcoreUtil2.getAllContentsOfType(container, Property);
+		
+		for (Property myP : cand) {
+			if (p != myP) {
+				if (p.name.equals(myP.name)) {
+					warning(INVALID_PROPERTY_NAME,  DSLPackage.Literals.PROPERTY__NAME);
+				}
+			}
 		}
 	}
 	

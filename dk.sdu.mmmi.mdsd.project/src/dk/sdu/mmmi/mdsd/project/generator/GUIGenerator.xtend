@@ -33,7 +33,7 @@ class GUIGenerator {
 	
 	def generateFxmlText(int x, int y) {
 		
-		// Â«Â»
+		// «»
 		
 		'''
 		<?xml version="1.0" encoding="UTF-8"?>
@@ -46,10 +46,10 @@ class GUIGenerator {
 		   <children>
 		      <GridPane gridLinesVisible="true" layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
 		        <columnConstraints>
-		        	Â«generateCol(x)Â»
+		        	«generateCol(x)»
 		        </columnConstraints>
 		        <rowConstraints>
-		        	Â«generateRow(y)Â»
+		        	«generateRow(y)»
 		        </rowConstraints>
 		      </GridPane>
 		   </children>
