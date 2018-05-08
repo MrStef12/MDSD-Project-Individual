@@ -31,7 +31,7 @@ endtask
 
 task driveShelf
 	pickup
-	if pickedUp ProductionFloor.TestShelf.PhysicalWeight + 20 < 130
+	if pickedUp PhysicalWeight + 20 < 130
 		turn left
 		backward 20
 	else
