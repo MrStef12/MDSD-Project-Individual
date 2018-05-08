@@ -6,11 +6,13 @@ package dk.sdu.mmmi.mdsd.project.scoping
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
 import dk.sdu.mmmi.mdsd.project.dSL.ForwardUntil
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
+import dk.sdu.mmmi.mdsd.project.dSL.Property
 import dk.sdu.mmmi.mdsd.project.dSL.StateAt
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.scoping.Scopes
+import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
 
 /**
  * This class contains custom scoping description.
@@ -26,6 +28,14 @@ class DSLScopeProvider extends AbstractDSLScopeProvider {
 		) {
 			val rootElement = EcoreUtil2.getRootContainer(context)
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Shelf)
+			return Scopes.scopeFor(candidates)
+		}
+		
+		if(
+			(context instanceof StatePickedUp && reference == Literals.STATE_PICKED_UP__PROP)
+		) {
+			val rootElement = EcoreUtil2.getRootContainer(context)
+			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Property)
 			return Scopes.scopeFor(candidates)
 		}
 		return super.getScope(context, reference)
