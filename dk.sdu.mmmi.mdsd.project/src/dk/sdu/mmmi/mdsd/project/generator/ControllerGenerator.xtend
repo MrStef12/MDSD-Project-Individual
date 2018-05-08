@@ -10,6 +10,7 @@ import java.util.List
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
 import dk.sdu.mmmi.mdsd.project.dSL.AreaItem
 import dk.sdu.mmmi.mdsd.project.dSL.Obstacle
+import dk.sdu.mmmi.mdsd.project.dSL.Mission
 
 class ControllerGenerator {
 	Resource resource;
@@ -34,7 +35,6 @@ class ControllerGenerator {
 	
 	def generateController(Area area) {
 		
-		//��
 		
 		'''
 		package robotdefinitionsample;
@@ -113,7 +113,6 @@ class ControllerGenerator {
 		
 		'''
 		«instanciateObjects(robots)»
-		
 		'''
 		
 	}
@@ -136,8 +135,14 @@ class ControllerGenerator {
 	
 	def dispatch construct(Robot r) {
 		'''
-		«»
-		Robot R «r.name» = new Robot(«r.name», new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
+		Robot «r.name» = new Robot(«r.name», new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
+		«generateMission(r)»
+		'''
+	}
+	
+	def generateMission(Robot r) {
+		'''
+		«r.name».setMission(generate.«r.name»(r));
 		'''
 	}
 	
