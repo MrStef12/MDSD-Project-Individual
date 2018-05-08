@@ -17,10 +17,10 @@ class ModelGenerator {
 		this.fsa = fsa
 		this.context = context
 		
-		generateModels(fsa, resource)
+		generateModels()
 	}
 	
-	def generateModels(IFileSystemAccess2 fsa, Resource resource) {
+	def generateModels() {
 		fsa.generateFile('/src/robotdefinitionsample/models/Shelf.java', shelfModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Vector2.java', vectorModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Property.java', PropertyModel)
