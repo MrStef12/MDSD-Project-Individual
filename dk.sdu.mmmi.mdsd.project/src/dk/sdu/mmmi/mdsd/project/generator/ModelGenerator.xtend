@@ -195,7 +195,7 @@ class ModelGenerator {
 		    
 		    @Override
 		    public void start(Stage stage) throws Exception {
-		        Parent root = FXMLLoader.load(getClass().getResource("ProductionFloor.fxml"));
+		        Parent root = FXMLLoader.load(getClass().getResource("«resource.allContents.filter(Area).next.name».fxml"));
 		        
 		        Scene scene = new Scene(root);
 		        
