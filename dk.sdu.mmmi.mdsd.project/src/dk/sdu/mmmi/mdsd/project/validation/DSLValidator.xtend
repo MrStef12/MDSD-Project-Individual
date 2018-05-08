@@ -17,7 +17,7 @@ import org.eclipse.xtext.validation.Check
 class DSLValidator extends AbstractDSLValidator {
 	
 
-	public static val INVALID_NAME = 'Invalid name 2 objects with same name';
+	public static val INVALID_NAME = 'Another shelf with the same name already exists';
 	
 	@Check(FAST)
 	def checkNames(Shelf s) {
@@ -28,7 +28,7 @@ class DSLValidator extends AbstractDSLValidator {
 			
 			if (s != myS) {
 				if (s.name.equals(myS.name)) {
-					warning(INVALID_NAME,  DSLPackage.Literals.AREA_ITEM__NAME);
+					error(INVALID_NAME,  DSLPackage.Literals.AREA_ITEM__NAME);
 				}
 			}
 
