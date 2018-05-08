@@ -33,7 +33,7 @@ class GUIGenerator {
 	
 	def generateFxmlText(int x, int y) {
 		
-		// ��
+		// Fix controller name
 		
 		'''
 		<?xml version="1.0" encoding="UTF-8"?>
@@ -42,9 +42,9 @@ class GUIGenerator {
 		<?import javafx.scene.control.*?>
 		<?import javafx.scene.layout.*?>
 		
-		<AnchorPane id="AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="robotdefinitionsample.FXMLDocumentController">
+		<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="robotdefinitionsample.«resource.allContents.filter(Area).next.name»Controller">
 		   <children>
-		      <GridPane gridLinesVisible="true" layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+		      <GridPane fx:id="grid" gridLinesVisible="true" layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="50.0">
 		        <columnConstraints>
 		        	«generateCol(x)»
 		        </columnConstraints>
@@ -52,6 +52,7 @@ class GUIGenerator {
 		        	«generateRow(y)»
 		        </rowConstraints>
 		      </GridPane>
+		      <Button fx:id="Tick" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClick" text="Tick" />
 		   </children>
 		</AnchorPane>
 		'''
