@@ -11,12 +11,6 @@ area ProductionFloor size 100 100
 	endshelf
 endarea
 
-area ProdFloor2 size 100 100
-	shelf TestShelf
-		pos 20 20
-	endshelf
-endarea
-
 terminatable WeightTooHigh
 
 task goToShelf

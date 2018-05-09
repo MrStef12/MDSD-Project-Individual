@@ -3,11 +3,7 @@ grammar dk.sdu.mmmi.mdsd.project.DSL with org.eclipse.xtext.common.Terminals
 generate dSL "http://www.sdu.dk/mmmi/mdsd/project/DSL"
 
 Production:
-	'production' name=ID items+=ProductionItem+
-;
-
-ProductionItem:
-	Area | TerminatableDef | Task | Robot
+	'production' name=ID area=Area terminatables+=TerminatableDef* tasks+=Task+ robots+=Robot+
 ;
 
 Area:
