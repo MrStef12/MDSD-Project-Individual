@@ -4,7 +4,6 @@
 package dk.sdu.mmmi.mdsd.project.scoping
 
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
-import dk.sdu.mmmi.mdsd.project.dSL.ForwardUntil
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
 import dk.sdu.mmmi.mdsd.project.dSL.Property
 import dk.sdu.mmmi.mdsd.project.dSL.StateAt
@@ -22,18 +21,13 @@ import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
  */
 class DSLScopeProvider extends AbstractDSLScopeProvider {
 	override getScope(EObject context, EReference reference) {
-		if(
-			(context instanceof StateAt && reference == Literals.STATE_AT__SHELF) ||
-			(context instanceof ForwardUntil && reference == Literals.FORWARD_UNTIL__SHELF)
-		) {
+		if(context instanceof StateAt && reference == Literals.STATE_AT__SHELF) {
 			val rootElement = EcoreUtil2.getRootContainer(context)
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Shelf)
 			return Scopes.scopeFor(candidates)
 		}
 		
-		if(
-			(context instanceof StatePickedUp && reference == Literals.STATE_PICKED_UP__PROP)
-		) {
+		if(context instanceof StatePickedUp && reference == Literals.STATE_PICKED_UP__PROP) {
 			val rootElement = EcoreUtil2.getRootContainer(context)
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Property)
 			return Scopes.scopeFor(candidates)

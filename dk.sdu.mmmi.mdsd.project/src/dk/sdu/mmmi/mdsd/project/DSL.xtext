@@ -48,7 +48,6 @@ TaskItem:
 
 Action:
 	{Pickup} 'pickup' 
-	| {ForwardUntil} 'forward' 'until' shelf=[Shelf]
 	| {Forward} 'forward' amount=INT
 	| {Backward} 'backward' amount=INT
 	| {Turn} 'turn' direction=Direction
