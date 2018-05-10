@@ -20,10 +20,7 @@ class ProjectGenerator {
 		fsa.generateFile('.gitignore', gitignore)
 		fsa.generateFile('/nbproject/project.xml', project)
 		fsa.generateFile('/nbproject/project.properties', projectProp)
-
-		fsa.generateFile('/nbproject/jfx-impl.xml', jfx)
-		var file = fsa.getURI("/nbproject/jfx-impl.xml");
-		file.appendFragment(jfxSegment.toString);
+		fsa.generateFile('/nbproject/jfx-impl.xml', jfx + jfxSegment.toString)
 		
 	}
 	
