@@ -25,11 +25,13 @@ endtask
 
 task driveShelf
 	pickup
-	if pickedUp PhysicalWeight < 130
-		turn left
-		backward 20
-	else
-		terminate WeightTooHigh
+	if at TestShelf
+		if pickedUp PhysicalWeight < 130
+			turn left
+			backward 20
+		else
+			terminate WeightTooHigh
+		endif
 	endif
 endtask
 

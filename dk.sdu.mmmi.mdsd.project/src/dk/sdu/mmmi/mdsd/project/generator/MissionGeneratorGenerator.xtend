@@ -117,6 +117,18 @@ class MissionGeneratorGenerator {
 		'''
 			t.addTask(new TaskItem(r, ActionCondition.CONDITION)
 				«condition.state.generateState»
+				.setIfTaskItems(
+					«FOR task : ifTasks»
+					«task.generateTaskItem»
+					«ENDFOR»
+				)
+				«IF elseTasks !== null»
+				.setElseTaskItems(
+					«FOR task : elseTasks»
+					«task.generateTaskItem»
+					«ENDFOR»
+				)
+				«ENDIF»
 			;
 		'''
 	}
