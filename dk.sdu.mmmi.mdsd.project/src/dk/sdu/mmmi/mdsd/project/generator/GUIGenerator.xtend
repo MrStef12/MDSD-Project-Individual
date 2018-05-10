@@ -23,15 +23,11 @@ class GUIGenerator {
 	
 	
 	def void generateArea(IFileSystemAccess2 fsa, Resource resource) {
-		var areas = resource.allContents.filter(Area).toList;
-		
-		for (Area area : areas) {
-			fsa.generateFile('/src/robotdefinitionsample/' + area.name + '.fxml', generateFxmlText(area.size.x, area.size.y));
-		}
-		
+		var area = resource.allContents.filter(Area).next;
+		fsa.generateFile('/src/robotdefinitionsample/' + area.name + '.fxml', area.generateFxmlText);
 	}
 	
-	def generateFxmlText(int x, int y) {
+	def generateFxmlText(Area area) {
 		
 		// Fix controller name
 		
@@ -42,14 +38,14 @@ class GUIGenerator {
 		<?import javafx.scene.control.*?>
 		<?import javafx.scene.layout.*?>
 		
-		<AnchorPane id="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="robotdefinitionsample.«resource.allContents.filter(Area).next.name»Controller">
+		<AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="robotdefinitionsample.«area.name»Controller">
 		   <children>
 		      <GridPane fx:id="grid" gridLinesVisible="true" layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="50.0">
 		        <columnConstraints>
-		        	«generateCol(x)»
+		        	«area.size.x.generateCol»
 		        </columnConstraints>
 		        <rowConstraints>
-		        	«generateRow(y)»
+		        	«area.size.y.generateRow»
 		        </rowConstraints>
 		      </GridPane>
 		      <Button fx:id="Tick" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClick" text="Tick" />
@@ -67,7 +63,7 @@ class GUIGenerator {
 	}
 	
 	def generateRow(int y) {
-				var result = "";
+		var result = "";
 		for (var i = 0; i < y; i++) {
 			result += "\n <RowConstraints minHeight=\"10.0\" prefHeight=\"30.0\" vgrow=\"SOMETIMES\" />"
 		}

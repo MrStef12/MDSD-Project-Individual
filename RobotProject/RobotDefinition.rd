@@ -1,6 +1,6 @@
 production MainTerminal
 
-area ProductionFloor size 100 100
+area ProductionFloor size 10 20
 	obstacle Pole
 		pos 2 2
 		size 1 1
