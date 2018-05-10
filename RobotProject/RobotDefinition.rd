@@ -25,7 +25,7 @@ endtask
 
 task driveShelf
 	pickup
-	if pickedUp PhysicalWeight + 20 < 130
+	if pickedUp PhysicalWeight < 130
 		turn left
 		backward 20
 	else
@@ -47,5 +47,6 @@ robot Rob1 in ProductionFloor
 			}
 			// other terminatables
 		}
+		driveShelf
 	endmission
 endrobot

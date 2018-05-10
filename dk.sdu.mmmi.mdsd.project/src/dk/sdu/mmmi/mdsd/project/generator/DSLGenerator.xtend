@@ -28,6 +28,7 @@ class DSLGenerator extends AbstractGenerator {
 		new ModelGenerator(resource, fsa, context);
 		new ProjectGenerator(resource, fsa, context);
 		new ExceptionGenerator(resource, fsa, context);
+		new MissionGeneratorGenerator(resource, fsa, context);
 	}
 
 }

@@ -68,13 +68,10 @@ Condition:
 	'if' state=State tasks+=TaskItem* else=Else? 'endif'
 ;
 
-State:
+State returns Expression:
 	{StateAt} 'at' shelf=[Shelf]
-	| left=Exp sign=Sign right=Exp
-;
-
-Else:
-	{Else} 'else' tasks+=TaskItem*
+	| {StatePickedUp} 'pickedUp' prop=[Property] sign=Sign right=Exp
+	| Exp {State.left = current} sign=Sign right=Exp
 ;
 
 Sign:
@@ -83,6 +80,10 @@ Sign:
 	| {GreaterThan} '>'
 	| {SmallerThanEquals} '<='
 	| {GreaterThanEquals} '>='
+;
+
+Else:
+	{Else} 'else' tasks+=TaskItem*
 ;
 
 Exp returns Expression:
@@ -106,7 +107,7 @@ Number returns Expression:
 ;
 
 StateVars returns Expression:
-	({StatePickedUp} 'pickedUp' prop=[Property] | {StateRetries} 'retries')
+	{StateRetries} 'retries'
 ;
 
 Robot:

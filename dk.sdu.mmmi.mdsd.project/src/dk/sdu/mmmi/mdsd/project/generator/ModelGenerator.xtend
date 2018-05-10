@@ -56,7 +56,6 @@ class ModelGenerator {
 		fsa.generateFile('/src/robotdefinitionsample/models/Robot.java', RobotModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Mission.java', MissionModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/ActionCondition.java', ActionCondition)
-		fsa.generateFile('/src/robotdefinitionsample/models/MissionGenerator.java', MissionGenerator)
 		fsa.generateFile('/src/robotdefinitionsample/models/Task.java', Task)
 		fsa.generateFile('/src/robotdefinitionsample/models/TaskItem.java', TaskItem)
 		fsa.generateFile('/src/robotdefinitionsample/RobotDefinitionSample.java', main)
@@ -278,36 +277,6 @@ class ModelGenerator {
 		    }
 		    
 		}'''
-	}
-	
-	def MissionGenerator() {
-		'''
-		package robotdefinitionsample.models;
-		
-		/**
-		 *
-		 * @author ditlev
-		 */
-		public class MissionGenerator {
-		    
-		    
-		    public Mission Robot1(Robot r) {
-		        Mission m = new Mission();
-		        Task t = new Task("asd");
-		        
-		        TaskItem ti = new TaskItem(r, ActionCondition.FORWARD);
-		        TaskItem ti1 = new TaskItem(r, ActionCondition.FORWARD);
-		        TaskItem ti2 = new TaskItem(r, ActionCondition.FORWARD);
-		        
-		        t.addTask(ti);
-		        t.addTask(ti1);
-		        t.addTask(ti2);
-		        m.addTask(t);
-		        return m;
-		    }
-		    
-		}
-		'''
 	}
 	
 	def ActionCondition() {
