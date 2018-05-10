@@ -54,7 +54,6 @@ class ModelGenerator {
 		fsa.generateFile('/src/robotdefinitionsample/models/Property.java', PropertyModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Obstacle.java', ObstacleModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Robot.java', RobotModel)
-		fsa.generateFile('/src/robotdefinitionsample/models/Mission.java', MissionModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/ActionCondition.java', ActionCondition)
 		fsa.generateFile('/src/robotdefinitionsample/models/Task.java', Task)
 		fsa.generateFile('/src/robotdefinitionsample/models/TaskItem.java', TaskItem)
@@ -301,74 +300,6 @@ class ModelGenerator {
 		    
 		}
 		
-		'''
-	}
-	
-	def MissionModel() {
-		'''
-		package robotdefinitionsample.models;
-		
-		import java.util.ArrayList;
-		import java.util.List;
-		import javafx.scene.control.Alert;
-		import javafx.scene.layout.GridPane;
-		import robotdefinitionsample.DesiredProps;
-		import robotdefinitionsample.exceptions.InvalidMove;
-		import robotdefinitionsample.ObstacleDetection;
-		
-		public class Mission {
-		    private List<Task> mission;
-		    private int currentTask;
-		    private boolean done;
-		    
-		    
-		    public Mission() {
-		        mission = new ArrayList<>();
-		        currentTask = 0;
-		        done = false;
-		    }
-		
-		    public boolean isDone() {
-		        return done;
-		    }
-		    
-		    public void addTask(Task t) {
-		        mission.add(t);
-		    }
-		    
-		    public void executeNext(GridPane grid, DesiredProps props) {
-		        Task t = mission.get(currentTask);
-				try {
-		            t.executeNext(props);
-		            if (ObstacleDetection.detect(grid, props)) {
-		                props.setDiscarded(true);
-		                throw new InvalidMove();
-		            }
-				} catch(InvalidMove e) {
-		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		            alert.setTitle("Invalid mode");
-		            alert.setHeaderText("Robot cannot execute task");
-		            alert.setContentText("The robot hit an invalid move");
-		            alert.showAndWait();
-		    	}
-		    	«FOR e : resource.allContents.filter(MissionTask).toList»
-		    		«IF e.terminated !== null»
-		    			catch («e.terminated.terminatable.name» e) {
-		    				«FOR ti : e.terminated.items»
-		    					«ti.generateTaskItem»
-		    				«ENDFOR»
-		    			}
-		    		«ENDIF»
-		    	«ENDFOR»
-		    	
-		        if (t.isDone()) {
-		            currentTask++;
-		        }
-		        if (currentTask == mission.size()) {
-		            done = true;
-		        }
-		    }
-		}
 		'''
 	}
 	

@@ -33,6 +33,8 @@ import dk.sdu.mmmi.mdsd.project.dSL.Num
 import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
 import dk.sdu.mmmi.mdsd.project.dSL.StateRetries
 import dk.sdu.mmmi.mdsd.project.dSL.Expression
+import dk.sdu.mmmi.mdsd.project.dSL.MissionTask
+import dk.sdu.mmmi.mdsd.project.dSL.TaskTerminated
 
 class MissionGeneratorGenerator {
 	
@@ -47,6 +49,130 @@ class MissionGeneratorGenerator {
 		this.context = context
 		
 		fsa.generateFile('/src/robotdefinitionsample/models/MissionGenerator.java', generateMissionGenerator)
+		fsa.generateFile('/src/robotdefinitionsample/models/Mission.java', generateMission)
+	}
+	
+	def generateMission() {
+		'''
+		/*
+		 * To change this license header, choose License Headers in Project Properties.
+		 * To change this template file, choose Tools | Templates
+		 * and open the template in the editor.
+		 */
+		package robotdefinitionsample.models;
+		
+		import java.util.ArrayList;
+		import java.util.List;
+		import javafx.scene.control.Alert;
+		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.DesiredProps;
+		import robotdefinitionsample.exceptions.InvalidMove;
+		import robotdefinitionsample.ObstacleDetection;
+		import robotdefinitionsample.exceptions.NoShelfPickedUp;
+		import robotdefinitionsample.exceptions.PropertyNotSet;
+		
+		/**
+		 *
+		 * @author ditlev
+		 */
+		public class Mission {
+		    private List<Task> mission;
+		    private int currentTask;
+		    private boolean done;
+		    private boolean failed;
+		    private GridPane grid;
+		    
+		    public Mission(GridPane grid) {
+		        mission = new ArrayList<>();
+		        currentTask = 0;
+		        done = false;
+		        failed = false;
+		        this.grid = grid;
+		    }
+		    
+		    public boolean isDone() {
+		        return done;
+		    }
+		    
+		    public void addTask(Task t) {
+		        mission.add(t);
+		    }
+		    
+		    public void addTaskAtCurrent(TaskItem t) {
+		        mission.get(currentTask).addTaskAtCurrent(t);
+		    }
+		    
+		    public Task getCurrentTask() {
+		        return mission.get(currentTask);
+		    }
+		    
+		    public void executeNext(DesiredProps props) {
+		        Task t = getCurrentTask();
+		        
+			try {
+		            t.executeNext(props);
+		            if (ObstacleDetection.detect(grid, props)) {
+		                props.setDiscarded(true);
+		                throw new InvalidMove();
+		            }
+			} catch(InvalidMove e) {
+		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		            alert.setTitle("Invalid mode");
+		            alert.setHeaderText("Robot cannot execute task");
+		            alert.setContentText("The robot hit an invalid move");
+		            alert.showAndWait();
+		            
+		            if (t.getRetries() < 3) {
+		                t.setRetry(true);
+		            } else {
+		                missionFailed();
+		            }
+		            
+		        } catch(NoShelfPickedUp e) {
+		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		            alert.setTitle("No shelf");
+		            alert.setHeaderText("Robot cannot execute task");
+		            alert.setContentText("The robot did not have a shelf picked up");
+		            alert.showAndWait();
+		        }
+		    	«FOR e : resource.allContents.filter(MissionTask).toList»
+		    		«IF e.terminated !== null»
+		    			catch («e.terminated.terminatable.name» e) {
+		    				«e.terminated.generateTaskItems»
+		    			}
+		    		«ENDIF»
+		    	«ENDFOR»
+		        
+		        if (t.isDone()) {
+		            currentTask++;
+		        }
+		        if (currentTask == mission.size()) {
+		            done = true;
+		        }
+		    }
+		
+		    private void missionFailed() {
+		        failed = true;
+		    }
+		    
+		    public boolean getFailed() {
+		        return failed;
+		    }
+		    
+		    //Called from TaskItem conditionAt()
+		    public boolean collision(String shelfName, DesiredProps props) {
+		        Shelf s = ObstacleDetection.getShelfAtPos(grid, props);
+		        if (s != null) {
+		            if (s.getName().equals(shelfName)) {
+		                return true;
+		            }
+		            return false;
+		        }
+		        return false;
+		    }
+		}
+		
+		'''
 	}
 	
 	def generateMissionGenerator() {
@@ -72,13 +198,22 @@ class MissionGeneratorGenerator {
 		'''
 	}
 	
-	def CharSequence generateTaskItems(Task task) {
+	def dispatch CharSequence generateTaskItems(Task task) {
 		'''
 			«FOR item : task.items»
-			«item.generateTaskItem»
+			t.addTask(«item.generateTaskItem»);
 			«ENDFOR»
 		'''
 	}
+	
+	def dispatch CharSequence generateTaskItems(TaskTerminated task) {
+		'''
+		«FOR item : task.items»
+		addTaskAtCurrent(«item.generateTaskItem»);
+		«ENDFOR»
+		'''
+	}
+	
 	
 	def dispatch generateTaskItem(Action action) {
 		switch (action) {
@@ -89,7 +224,7 @@ class MissionGeneratorGenerator {
 			default:
 				previousTaskItem =
 				'''
-					t.addTask(new TaskItem(r, ActionCondition.«action.toEnumName»));
+					new TaskItem(r, ActionCondition.«action.toEnumName»)
 				'''
 		}
 	}
@@ -115,7 +250,7 @@ class MissionGeneratorGenerator {
 		val ifTasks = condition.tasks;
 		val elseTasks = if(condition.getElse !== null) condition.getElse.tasks;
 		'''
-			t.addTask(new TaskItem(r, ActionCondition.CONDITION)
+			new TaskItem(r, ActionCondition.CONDITION)
 				«condition.state.generateState»
 				.setIfTaskItems(
 					«FOR task : ifTasks»
@@ -129,7 +264,6 @@ class MissionGeneratorGenerator {
 					«ENDFOR»
 				)
 				«ENDIF»
-			;
 		'''
 	}
 	
