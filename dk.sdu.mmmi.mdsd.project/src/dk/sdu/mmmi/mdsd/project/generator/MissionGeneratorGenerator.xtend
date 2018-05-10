@@ -63,6 +63,7 @@ class MissionGeneratorGenerator {
 		
 		import java.util.ArrayList;
 		import java.util.List;
+		import java.util.Map;
 		import javafx.scene.control.Alert;
 		import javafx.scene.layout.GridPane;
 		import robotdefinitionsample.DesiredProps;
@@ -180,14 +181,17 @@ class MissionGeneratorGenerator {
 		'''
 			package robotdefinitionsample.models;
 			
+			import java.util.List;
+			import java.util.Map;
 			import javafx.scene.layout.GridPane;
 			
 			public class MissionGenerator {
 				«FOR robot : robots»
 				public Mission «robot.name»(Robot r, GridPane grid) {
 					Mission mission = new Mission(grid);
+					Task items;
 					«FOR missionTask : robot.mission.tasks»
-					Task «missionTask.task.name» = new Task("«missionTask.task.name»");
+					items = new Task("«missionTask.task.name»");
 					«missionTask.task.generateTaskItems»
 					mission.addTask(«missionTask.task.name»);
 					«ENDFOR»
@@ -201,7 +205,7 @@ class MissionGeneratorGenerator {
 	def dispatch CharSequence generateTaskItems(Task task) {
 		'''
 			«FOR item : task.items»
-			t.addTask(«item.generateTaskItem»);
+			«item.generateTaskItem»
 			«ENDFOR»
 		'''
 	}
@@ -209,13 +213,12 @@ class MissionGeneratorGenerator {
 	def dispatch CharSequence generateTaskItems(TaskTerminated task) {
 		'''
 		«FOR item : task.items»
-		addTaskAtCurrent(«item.generateTaskItem»);
+		addTaskAtCurrent(«item.generateTaskItem.toString.substring(10)»);
 		«ENDFOR»
 		'''
 	}
 	
-	
-	def dispatch generateTaskItem(Action action) {
+	def dispatch CharSequence generateTaskItem(Action action) {
 		switch (action) {
 			Retry: 
 				previousTaskItem
@@ -224,7 +227,7 @@ class MissionGeneratorGenerator {
 			default:
 				previousTaskItem =
 				'''
-					new TaskItem(r, ActionCondition.«action.toEnumName»)
+					items.add(new TaskItem(r, ActionCondition.«action.toEnumName»));
 				'''
 		}
 	}
@@ -246,23 +249,33 @@ class MissionGeneratorGenerator {
 		}
 	}
 	
-	def dispatch generateTaskItem(Condition condition) {
+	def dispatch CharSequence generateTaskItem(Condition condition) {
 		val ifTasks = condition.tasks;
 		val elseTasks = if(condition.getElse !== null) condition.getElse.tasks;
 		'''
-			new TaskItem(r, ActionCondition.CONDITION)
+			items.add(new TaskItem(r, ActionCondition.CONDITION)
 				«condition.state.generateState»
 				.setIfTaskItems(
-					«FOR task : ifTasks»
-					«task.generateTaskItem»
-					«ENDFOR»
+					new IConditionTasks() {
+			            @Override
+			            public void addTasks(List<TaskItem> items) {
+			                «FOR task : ifTasks»
+        					«task.generateTaskItem»
+        					«ENDFOR»
+			            }
+			        }
 				)
 				«IF elseTasks !== null»
 				.setElseTaskItems(
-					«FOR task : elseTasks»
-					«task.generateTaskItem»
-					«ENDFOR»
-				)
+					new IConditionTasks() {
+						@Override
+						public void addTasks(List<TaskItem> items) {
+        					«FOR task : elseTasks»
+        					«task.generateTaskItem»
+        					«ENDFOR»
+						}
+					}
+				));
 				«ENDIF»
 		'''
 	}

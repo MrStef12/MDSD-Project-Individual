@@ -21,6 +21,8 @@ task goToShelf
 	else
 		turn right
 	endif
+	
+		do driveShelf
 endtask
 
 task driveShelf
