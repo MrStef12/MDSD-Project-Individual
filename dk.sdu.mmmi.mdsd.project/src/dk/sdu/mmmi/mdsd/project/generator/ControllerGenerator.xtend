@@ -76,12 +76,12 @@ class ControllerGenerator {
 				«robots(area.name)»
 		        «generateItems(area.items)»
 		        
-                Robot r = new Robot("name", new Vector2(0,0));
-                r.setMission(generator.Robot1(r));
-        
-                robots.add(r);
-                
-                grid.add(r, r.getPos().getX(), r.getPos().getY());
+		        Robot r = new Robot("name", new Vector2(0,0));
+		        r.setMission(generator.Robot1(r));
+		
+				robots.add(r);
+				
+				grid.add(r, r.getPos().getX(), r.getPos().getY());
 		    }
 		
 		    private void tick() {
