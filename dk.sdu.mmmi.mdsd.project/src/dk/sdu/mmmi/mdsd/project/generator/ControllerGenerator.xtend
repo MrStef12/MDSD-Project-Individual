@@ -105,7 +105,6 @@ class ControllerGenerator {
 		
 		var robots = resource.allContents.filter[r |
 			if (r instanceof Robot) {
-				System.out.println("Fandt robot: " + r.area.name.equals(AreaName));
 				return r.area.name.equals(AreaName);
 			}
 			false

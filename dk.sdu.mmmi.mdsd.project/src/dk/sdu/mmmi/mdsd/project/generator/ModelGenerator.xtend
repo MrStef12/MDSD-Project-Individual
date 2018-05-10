@@ -1,12 +1,38 @@
 package dk.sdu.mmmi.mdsd.project.generator
 
 import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import dk.sdu.mmmi.mdsd.project.dSL.Area
-import dk.sdu.mmmi.mdsd.project.dSL.Terminate
 import dk.sdu.mmmi.mdsd.project.dSL.MissionTask
+import dk.sdu.mmmi.mdsd.project.dSL.Action
+import dk.sdu.mmmi.mdsd.project.dSL.Condition
+import dk.sdu.mmmi.mdsd.project.dSL.Pickup
+import dk.sdu.mmmi.mdsd.project.dSL.Forward
+import dk.sdu.mmmi.mdsd.project.dSL.Backward
+import dk.sdu.mmmi.mdsd.project.dSL.Turn
+import dk.sdu.mmmi.mdsd.project.dSL.LeftDir
+import dk.sdu.mmmi.mdsd.project.dSL.RightDir
+import dk.sdu.mmmi.mdsd.project.dSL.State
+import dk.sdu.mmmi.mdsd.project.dSL.StateAt
+import dk.sdu.mmmi.mdsd.project.dSL.Expression
+import dk.sdu.mmmi.mdsd.project.dSL.Plus
+import dk.sdu.mmmi.mdsd.project.dSL.Minus
+import dk.sdu.mmmi.mdsd.project.dSL.Mult
+import dk.sdu.mmmi.mdsd.project.dSL.Div
+import dk.sdu.mmmi.mdsd.project.dSL.Num
+import dk.sdu.mmmi.mdsd.project.dSL.Sign
+import dk.sdu.mmmi.mdsd.project.dSL.Equals
+import dk.sdu.mmmi.mdsd.project.dSL.SmallerThan
+import dk.sdu.mmmi.mdsd.project.dSL.GreaterThan
+import dk.sdu.mmmi.mdsd.project.dSL.SmallerThanEquals
+import dk.sdu.mmmi.mdsd.project.dSL.GreaterThanEquals
+import dk.sdu.mmmi.mdsd.project.dSL.TaskItem
+import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
+import dk.sdu.mmmi.mdsd.project.dSL.StateRetries
+import dk.sdu.mmmi.mdsd.project.dSL.Else
+import dk.sdu.mmmi.mdsd.project.dSL.TerminatableDef
+import dk.sdu.mmmi.mdsd.project.dSL.Terminatable
 
 class ModelGenerator {
 	
@@ -181,7 +207,7 @@ class ModelGenerator {
 		        return done;
 		    }
 		    
-		    public void executeNext(DesiredProps props) throws InvalidMove, PropertyNotSet, NoShelfPickedUp, Exception {
+		    public void executeNext(DesiredProps props) throws InvalidMove, NoShelfPickedUp, «FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR» {
 		        TaskItem currentTaskItem = items.get(currentTask);
 		        if (!shouldRetry) {
 		            while(currentTaskItem.isDone()) {
@@ -359,7 +385,9 @@ class ModelGenerator {
 		    	«FOR e : resource.allContents.filter(MissionTask).toList»
 		    		«IF e.terminated !== null»
 		    			catch («e.terminated.terminatable.name» e) {
-		    				//Do some stuff
+		    				«FOR ti : e.terminated.items»
+		    					«ti.generateTaskItem»
+		    				«ENDFOR»
 		    			}
 		    		«ENDIF»
 		    	«ENDFOR»
@@ -373,6 +401,65 @@ class ModelGenerator {
 		    }
 		}
 		'''
+	}
+	
+	def CharSequence generateTaskItem(TaskItem t) {		
+		switch t {
+			Pickup : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.PICKUP));'''
+			Forward : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.FORWARD)«IF t.amount != 0».setTicksToGo(«t.amount»)«ENDIF»);'''
+			Backward : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.BACKWARD)«IF t.amount != 0».setTicksToGo(«t.amount»)«ENDIF»);'''
+			Turn : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.«turnDirection(t.direction)»));'''
+			Else : '''«t.generateTaskItem»'''
+			Condition : s(t)
+
+		}
+	}
+	
+	def s(Condition c) {
+		var tasks = c.tasks;
+		var elseTasks = c.getElse.tasks;
+		switch c {
+			StateAt : '''addTaskCurrent(new TaskItem(robot, ActionCondition.CONDITIONAT).setAtShelfName(«c.shelf.name»));'''
+			State : '''if («c.left.displayExp» «c.sign.displaySign» «c.right.displayExp») {
+				«FOR t : tasks»
+				«t.generateTaskItem»
+				«ENDFOR»
+			} «IF elseTasks !== null» else { «FOR task : elseTasks» «task.generateTaskItem» «ENDFOR» }«ENDIF»
+			'''
+		}
+	}
+	
+	
+	def displaySign(Sign s) {
+		switch s {
+			Equals : '''=='''
+			SmallerThan : '''<'''
+			SmallerThanEquals : '''<='''
+			GreaterThan : '''>'''
+			GreaterThanEquals : '''>='''
+		}
+	}
+	
+	// Ulriks display function 
+	def String displayExp(Expression exp) {
+		"("+switch exp {
+			Plus: exp.left.displayExp+"+"+exp.right.displayExp
+			Minus: exp.left.displayExp+"-"+exp.right.displayExp
+			Mult: exp.left.displayExp+"*"+exp.right.displayExp
+			Div: exp.left.displayExp+"/"+exp.right.displayExp
+			Num: Integer.toString(exp.value)
+			StatePickedUp : ''''''
+			StateRetries : '''mission.get(currentTask).getRetries() { mission.get(currentTask).setRetry(true) }'''
+			default: throw new Error("Invalid expression")
+		}+")"
+	}
+	
+	def dispatch turnDirection(LeftDir d) {
+		'''TURN_CW'''
+	}
+	
+	def dispatch turnDirection(RightDir d) {
+		'''TURN_CCW'''
 	}
 	
 	def RobotModel() {
