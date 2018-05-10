@@ -372,64 +372,6 @@ class ModelGenerator {
 		'''
 	}
 	
-	def CharSequence generateTaskItem(TaskItem t) {		
-		switch t {
-			Pickup : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.PICKUP));'''
-			Forward : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.FORWARD)«IF t.amount != 0».setTicksToGo(«t.amount»)«ENDIF»);'''
-			Backward : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.BACKWARD)«IF t.amount != 0».setTicksToGo(«t.amount»)«ENDIF»);'''
-			Turn : '''addTaskAtCurrent(new TaskItem(robot, ActionCondition.«turnDirection(t.direction)»));'''
-			Else : '''«t.generateTaskItem»'''
-			Condition : s(t)
-
-		}
-	}
-	
-	def s(Condition c) {
-		var tasks = c.tasks;
-		var elseTasks = c.getElse.tasks;
-		switch c {
-			StateAt : '''addTaskCurrent(new TaskItem(robot, ActionCondition.CONDITIONAT).setAtShelfName(«c.shelf.name»));'''
-			State : '''if («c.left.displayExp» «c.sign.displaySign» «c.right.displayExp») {
-				«FOR t : tasks»
-				«t.generateTaskItem»
-				«ENDFOR»
-			} «IF elseTasks !== null» else { «FOR task : elseTasks» «task.generateTaskItem» «ENDFOR» }«ENDIF»
-			'''
-		}
-	}
-	
-	
-	def displaySign(Sign s) {
-		switch s {
-			Equals : '''=='''
-			SmallerThan : '''<'''
-			SmallerThanEquals : '''<='''
-			GreaterThan : '''>'''
-			GreaterThanEquals : '''>='''
-		}
-	}
-	
-	// Ulriks display function 
-	def String displayExp(Expression exp) {
-		"("+switch exp {
-			Plus: exp.left.displayExp+"+"+exp.right.displayExp
-			Minus: exp.left.displayExp+"-"+exp.right.displayExp
-			Mult: exp.left.displayExp+"*"+exp.right.displayExp
-			Div: exp.left.displayExp+"/"+exp.right.displayExp
-			Num: Integer.toString(exp.value)
-			StatePickedUp : ''''''
-			StateRetries : '''mission.get(currentTask).getRetries() { mission.get(currentTask).setRetry(true) }'''
-			default: throw new Error("Invalid expression")
-		}+")"
-	}
-	
-	def dispatch turnDirection(LeftDir d) {
-		'''TURN_CW'''
-	}
-	
-	def dispatch turnDirection(RightDir d) {
-		'''TURN_CCW'''
-	}
 	
 	def RobotModel() {
 		'''
