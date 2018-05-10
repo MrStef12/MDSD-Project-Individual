@@ -33,7 +33,7 @@ class DSLGenerator extends AbstractGenerator {
 		new ControllerGenerator(resource, fsa, context);
 		new ModelGenerator(resource, fsa, context);
 		new ProjectGenerator(resource, fsa, context);
-		
+		new ExceptionGenerator(resource, fsa, context);
 	}
 	
 	// Ulriks display function 
