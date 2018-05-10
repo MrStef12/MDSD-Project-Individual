@@ -25,11 +25,11 @@ class ControllerGenerator {
 	}
 	
 	def void generateArea(IFileSystemAccess2 fsa, Resource resource) {
-		var areas = resource.allContents.filter(Area).toList;
+		var area = resource.allContents.filter(Area).next;
 		
-		for (Area area : areas) {
-			fsa.generateFile('/src/robotdefinitionsample/' + area.name + 'Controller.java', generateController(area) );
-		}
+		
+		fsa.generateFile('/src/robotdefinitionsample/' + area.name + 'Controller.java', generateController(area) );
+		
 		
 	}
 	

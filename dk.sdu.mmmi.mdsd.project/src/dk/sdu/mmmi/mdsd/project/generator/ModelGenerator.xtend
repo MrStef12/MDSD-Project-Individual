@@ -5,6 +5,8 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import dk.sdu.mmmi.mdsd.project.dSL.Area
+import dk.sdu.mmmi.mdsd.project.dSL.Terminate
+import dk.sdu.mmmi.mdsd.project.dSL.MissionTask
 
 class ModelGenerator {
 	
@@ -135,6 +137,10 @@ class ModelGenerator {
 		
 		import java.util.ArrayList;
 		import java.util.List;
+		import robotdefinitionsample.DesiredProps;
+		import robotdefinitionsample.exceptions.InvalidMove;
+		import robotdefinitionsample.exceptions.NoShelfPickedUp;
+		import robotdefinitionsample.exceptions.PropertyNotSet;
 		
 		/**
 		 *
@@ -145,35 +151,70 @@ class ModelGenerator {
 		    private List<TaskItem> items;
 		    private int currentTask;
 		    private boolean done;
+		    private int retries;
+		    private boolean shouldRetry;
 		    
 		    public Task(String name) {
 		        this.name = name;
-		        items = new ArrayList<>();
-		        currentTask = 0;
-		        done = false;
+		        this.items = new ArrayList<>();
+		        this.currentTask = 0;
+		        this.done = false;
+		        this.retries = 0;
+		        this.shouldRetry = false;
 		    }
 		    
-		    public void addTask(TaskItem item) {
+		    //anonymously task comes generaly from a TaskItem
+		    public Task() {
+		        this.items = new ArrayList<>();
+		        this.currentTask = 0;
+		        this.done = false;
+		        this.retries = 0;
+		        this.shouldRetry = false;
+		    }
+		    
+		    public Task addTask(TaskItem item) {
 		        items.add(item);
+		        return this;
 		    }
 		    
-		    public boolean done() {
+		    public boolean isDone() {
 		        return done;
 		    }
 		    
-		    public void executeTaskItem() {
+		    public void executeNext(DesiredProps props) throws InvalidMove, PropertyNotSet, NoShelfPickedUp, Exception {
 		        TaskItem currentTaskItem = items.get(currentTask);
-		        
-		        currentTaskItem.executeCommand();
-		        if (currentTaskItem.done()) {
-		            currentTask++;
+		        if (!shouldRetry) {
+		            while(currentTaskItem.isDone()) {
+		                currentTask++;
+		                currentTaskItem = items.get(currentTask);
+		            }    
+		        } else {
+		            retries++;
+		            currentTaskItem.incrementTicksToGo();
+		            shouldRetry = false;
 		        }
+		        
+		        currentTaskItem.executeCommand(props);
 		        
 		        if (currentTask == items.size()) {
 		            done = true;
 		        }
 		    }
+		    
+		    public void setRetry(boolean b) {
+		        this.shouldRetry = b;
+		    }
+		    
+		    public int getRetries() {
+		        return retries;
+		    }
+		
+		    void addTaskAtCurrent(TaskItem t) {
+		        items.add(currentTask + 1, t);
+		        System.out.println("Okay");
+		    }
 		}
+		
 		'''
 	}
 	
@@ -253,16 +294,18 @@ class ModelGenerator {
 		 */
 		public enum ActionCondition {
 		    PICKUP,
-		    FORWARDUNTIL,
 		    FORWARD,
 		    BACKWARD,
-		    TURN,
-		    RETRY,
+		    TURN_CW,
+		    TURN_CCW,
 		    DO,
 		    TERMINATE,
-		    CONDITION
+		    CONDITIONAT,
+		    CONDITIONPICKEDUP,
+		    CONDITIONRETRIES
 		    
 		}
+		
 		'''
 	}
 	
@@ -283,6 +326,7 @@ class ModelGenerator {
 		    private int currentTask;
 		    private boolean done;
 		    
+		    
 		    public Mission() {
 		        mission = new ArrayList<>();
 		        currentTask = 0;
@@ -299,19 +343,27 @@ class ModelGenerator {
 		    
 		    public void executeNext(GridPane grid, DesiredProps props) {
 		        Task t = mission.get(currentTask);
-			try {
+				try {
 		            t.executeNext(props);
 		            if (ObstacleDetection.detect(grid, props)) {
 		                props.setDiscarded(true);
 		                throw new InvalidMove();
 		            }
-			} catch(InvalidMove e) {
+				} catch(InvalidMove e) {
 		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		            alert.setTitle("Invalid mode");
 		            alert.setHeaderText("Robot cannot execute task");
 		            alert.setContentText("The robot hit an invalid move");
 		            alert.showAndWait();
-		        }
+		    	}
+		    	«FOR e : resource.allContents.filter(MissionTask).toList»
+		    		«IF e.terminated !== null»
+		    			catch («e.terminated.terminatable.name» e) {
+		    				//Do some stuff
+		    			}
+		    		«ENDIF»
+		    	«ENDFOR»
+		    	
 		        if (t.isDone()) {
 		            currentTask++;
 		        }
