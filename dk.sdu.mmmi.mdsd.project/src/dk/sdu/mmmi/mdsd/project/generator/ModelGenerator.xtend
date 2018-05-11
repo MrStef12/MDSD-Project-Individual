@@ -62,6 +62,7 @@ class ModelGenerator {
 	}
 	
 	def TaskItem() {
+		//«FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR»
 		'''
 		/*
 		 * To change this license header, choose License Headers in Project Properties.
@@ -69,6 +70,10 @@ class ModelGenerator {
 		 * and open the template in the editor.
 		 */
 		package robotdefinitionsample.models;
+		
+		import robotdefinitionsample.DesiredProps;
+		import robotdefinitionsample.exceptions.InvalidMove;
+		import robotdefinitionsample.exceptions.NoShelfPickedUp;
 		
 		/**
 		 *
@@ -78,75 +83,238 @@ class ModelGenerator {
 		    
 		    //Direction values
 		    private final int right = 0;
-		    private final int up = 90;
+		    private final int up = 270;
 		    private final int left = 180;
-		    private final int down = 270;
+		    private final int down = 90;
 		    
 		    private Robot robot;
 		    private ActionCondition ac;
 		    private boolean done;
+		    private int ticksToGo;
+		    private String atShelfName;
+		    private String shelfToPickUp;
+		    private ICondition conditionChecker;
+		    private TaskItem[] ifTaskItems;
+		    private TaskItem[] elseTaskItems;
 		    
 		    public TaskItem(Robot robot, ActionCondition ac) {
 		        this.robot = robot;
 		        this.ac = ac;
 		        this.done = false;
+		        this.ticksToGo = 1;
 		    }
 		    
 		    public ActionCondition getAction() {
 		        return ac;
 		    }
 		    
-		    public void executeCommand() {
+		    public void executeCommand(DesiredProps props) throws NoShelfPickedUp, InvalidMove, Exception, «FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR» {
 		        //Maybe some general code can be done here.
 		        
 		        switch (ac) {
 		            case FORWARD:
-		                forward();
+		                forward(props);
 		                break;
-		            case TURN:
-		                turn();
+		            case TURN_CW:
+		                turnCW(props);
+		                break;
+		            case TURN_CCW:
+		                turnCCW(props);
+		                break;
+		            case BACKWARD:
+		                backward(props);
+		                break;
+		            case CONDITION:
+		                condition(props);
+		                break;
+		            case CONDITIONAT:
+		                conditionAt(props);
+		                break;
+		            case PICKUP:
+		                pickUp(props);
 		                break;
 		        }
-		        
-		        done = true;
-		        
 		    }
 		    
-		    public boolean done() {
+		    public boolean isDone() {
 		        return done;
 		    }
 		    
-		    private void forward() {
+		    private void forward(DesiredProps props) {
 		       
 		        int currentDirection = (int) robot.rotateProperty().get();
+		
+			        switch (currentDirection) {
+			            case right:
+			                props.setPos(robot.getPos().add(1, 0));
+			                ticksToGo--;
+			                break;
+			            case left:
+			                props.setPos(robot.getPos().add(-1, 0));
+			                ticksToGo--;
+			                break;
+			            case up:
+			                props.setPos(robot.getPos().add(0, -1));
+			                ticksToGo--;
+			                break;
+			            case down:
+			                props.setPos(robot.getPos().add(0, 1));
+			                ticksToGo--;
+			                break;
+			        }
+		
+			        if (ticksToGo == 0) {
+		                done = true;
+		            }
+		    }
+		    
+		    private void backward(DesiredProps props) {
+		    	int currentDirection = (int) robot.rotateProperty().get();
 		        
-		        switch (currentDirection) {
-		            case right:
-		                robot.getPos().setX(robot.getPos().getX() + 1);
-		                break;
-		            case left:
-		                robot.getPos().setX(robot.getPos().getX() - 1);
-		                break;
-		            case up:
-		                robot.getPos().setY(robot.getPos().getY() -1);
-		                break;
-		            case down:
-		                robot.getPos().setY(robot.getPos().getY() + 1);
-		                break;
+		    	while(ticksToGo > 0) {
+			    	switch (currentDirection) {
+			        case right:
+			            props.setPos(robot.getPos().add(-ticksToGo, 0));
+			            ticksToGo--;
+			            break;
+			        case left:
+			            props.setPos(robot.getPos().add(ticksToGo, 0));
+			            ticksToGo--;
+			            break;
+			        case up:
+			            props.setPos(robot.getPos().add(0, ticksToGo));
+			            ticksToGo--;
+			            break;
+			        case down:
+			            props.setPos(robot.getPos().add(0, -ticksToGo));
+			            ticksToGo--;
+			            break;
+			    	}
+		    	}
+		
+		        if (ticksToGo == 0) {
+		            done = true;
 		        }
 		    }
 		    
-		    private void turn() {
+		    private void turnCW(DesiredProps props) {
 		        int currentDirection = (int) robot.rotateProperty().get();
 		        
+		        switch (currentDirection) {
+		        case right:
+		            props.setRotation(down);
+		            break;
+		        case left:
+		            props.setRotation(up);
+		            break;
+		        case up:
+		            props.setRotation(right);
+		            break;
+		        case down:
+		            props.setRotation(left);
+		            break;
+		        }  
 		        
-		        
+		        done = true;
 		    }
 		    
-		    private void backward() {
+		    private void turnCCW(DesiredProps props) {
+		        int currentDirection = (int) robot.rotateProperty().get();
 		        
+		        switch (currentDirection) {
+		        case right:
+		            props.setRotation(up);
+		            break;
+		        case left:
+		        	props.setRotation(down);
+		            break;
+		        case up:
+		        	props.setRotation(left);
+		            break;
+		        case down:
+		        	props.setRotation(right);
+		            break;
+		        }
+		        
+		        done = true;
+		    }
+		
+		    private void pickUp(DesiredProps props) {
+		        props.setShelfNameToPickUp(shelfToPickUp);
+		        done = true;
+		    }
+		    
+		    public TaskItem setTicksToGo(int speed) {
+		    	this.ticksToGo = speed;
+		    	return this;
+		    }
+		    
+		    public void incrementTicksToGo() {
+		        ticksToGo++;
+		    }
+		    
+		    public TaskItem setAtShelfName(String shelfName) {
+		        this.atShelfName = shelfName;
+		        return this;
+		    }
+		
+		    public TaskItem setShelfToPickUp(String shelfToPickUp) {
+		        this.shelfToPickUp = shelfToPickUp;
+		        return this;
+		    }
+		    
+		    private void condition(DesiredProps props) throws Exception {
+		        Shelf s = robot.getShelf();
+		        if (conditionChecker.checkCondition(robot.getMission().getCurrentTask().getRetries(), s, s != null ? s.getShelfProperties() : null)) {
+		            conditionProcessTasks(ifTaskItems, props);
+		        } else {
+		            conditionProcessTasks(elseTaskItems, props);
+		        }
+		        done = true;
+		    }
+		    
+		    private void conditionProcessTasks(TaskItem[] items, DesiredProps props) throws Exception {
+		        for (int i=0; i<items.length; i++) {
+		            TaskItem ti = items[i];
+		            if (i == 0) {
+		                ti.executeCommand(props);
+		            } else {
+		                robot.getMission().addTaskAtCurrent(ti);
+		            }
+		        }
+		    }
+		    
+		    public TaskItem setConditionChecker(ICondition checker) {
+		        conditionChecker = checker;
+		        return this;
+		    }
+		
+		    public TaskItem setIfTaskItems(TaskItem... ifTaskItems) {
+		        this.ifTaskItems = ifTaskItems;
+		        return this;
+		    }
+		
+		    public TaskItem setElseTaskItems(TaskItem...elseTaskItems) {
+		        this.elseTaskItems = elseTaskItems;
+		        return this;
+		    }
+		
+		    private void conditionAt(DesiredProps props) throws Exception {
+		        if (atShelfName != null) {
+		            if (robot.getMission().collision(atShelfName, props)) {
+		                // the first taskitem should be added last.
+		                // As in the taskitems steps is reversed
+		                conditionProcessTasks(ifTaskItems, props);
+		            } else {
+		                conditionProcessTasks(elseTaskItems, props);
+		            }
+		            done = true;
+		        } else {
+		            throw new Exception("Custom exception no shelf name set");
+		        }
 		    }
 		}
+
 		'''
 	}
 	
