@@ -16,13 +16,9 @@ import org.eclipse.xtext.generator.IGeneratorContext
 class DSLGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
-
-
+		fsa.generateFile('/src/robotdefinitionsample/robot.png', this.class.getResourceAsStream('robot.png'))
+		
+		new InterfaceGenerator(resource, fsa, context);
 		new GUIGenerator(resource, fsa, context);
 		new ControllerGenerator(resource, fsa, context);
 		new ModelGenerator(resource, fsa, context);

@@ -54,11 +54,6 @@ class MissionGeneratorGenerator {
 	
 	def generateMission() {
 		'''
-		/*
-		 * To change this license header, choose License Headers in Project Properties.
-		 * To change this template file, choose Tools | Templates
-		 * and open the template in the editor.
-		 */
 		package robotdefinitionsample.models;
 		
 		import java.util.ArrayList;
@@ -67,28 +62,26 @@ class MissionGeneratorGenerator {
 		import javafx.scene.control.Alert;
 		import javafx.scene.layout.GridPane;
 		import robotdefinitionsample.DesiredProps;
-		import robotdefinitionsample.exceptions.InvalidMove;
 		import robotdefinitionsample.ObstacleDetection;
-		import robotdefinitionsample.exceptions.NoShelfPickedUp;
-		import robotdefinitionsample.exceptions.PropertyNotSet;
+		import robotdefinitionsample.exceptions.*;
+		import robotdefinitionsample.interfaces.ICondition;
+		import robotdefinitionsample.interfaces.IConditionTasks;
 		
-		/**
-		 *
-		 * @author ditlev
-		 */
 		public class Mission {
+			private Robot parent;
 		    private List<Task> mission;
 		    private int currentTask;
 		    private boolean done;
 		    private boolean failed;
 		    private GridPane grid;
 		    
-		    public Mission(GridPane grid) {
+		    public Mission(Robot parent, GridPane grid) {
+		    	this.parent = parent;
+		        this.grid = grid;
 		        mission = new ArrayList<>();
 		        currentTask = 0;
 		        done = false;
 		        failed = false;
-		        this.grid = grid;
 		    }
 		    
 		    public boolean isDone() {
@@ -139,10 +132,23 @@ class MissionGeneratorGenerator {
 		    	«FOR e : resource.allContents.filter(MissionTask).toList»
 		    		«IF e.terminated !== null»
 		    			catch («e.terminated.terminatable.name» e) {
+		    				Robot r = this.parent;
+		    				List<TaskItem> items = new ArrayList<>();
 		    				«e.terminated.generateTaskItems»
+		    				for(TaskItem item : items) {
+		    					addTaskAtCurrent(item);
+		    				}
 		    			}
 		    		«ENDIF»
 		    	«ENDFOR»
+		    	catch(Exception e) {
+		    		e.printStackTrace();
+		    		Alert alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Generic error");
+					alert.setHeaderText("Woops!");
+					alert.setContentText("The robot hit an exception that it couldn't handle. See console");
+					alert.showAndWait();
+				}
 		        
 		        if (t.isDone()) {
 		            currentTask++;
@@ -184,16 +190,18 @@ class MissionGeneratorGenerator {
 			import java.util.List;
 			import java.util.Map;
 			import javafx.scene.layout.GridPane;
+			import robotdefinitionsample.interfaces.ICondition;
+			import robotdefinitionsample.interfaces.IConditionTasks;
 			
 			public class MissionGenerator {
 				«FOR robot : robots»
 				public Mission «robot.name»(Robot r, GridPane grid) {
-					Mission mission = new Mission(grid);
+					Mission mission = new Mission(r, grid);
 					Task items;
 					«FOR missionTask : robot.mission.tasks»
 					items = new Task("«missionTask.task.name»");
 					«missionTask.task.generateTaskItems»
-					mission.addTask(«missionTask.task.name»);
+					mission.addTask(items);
 					«ENDFOR»
 					return mission;
 				}
@@ -212,9 +220,9 @@ class MissionGeneratorGenerator {
 	
 	def dispatch CharSequence generateTaskItems(TaskTerminated task) {
 		'''
-		«FOR item : task.items»
-		addTaskAtCurrent(«item.generateTaskItem.toString.substring(10)»);
-		«ENDFOR»
+			«FOR item : task.items»
+			«item.generateTaskItem»
+			«ENDFOR»
 		'''
 	}
 	
@@ -259,12 +267,12 @@ class MissionGeneratorGenerator {
 					new IConditionTasks() {
 			            @Override
 			            public void addTasks(List<TaskItem> items) {
-			                «FOR task : ifTasks»
+			            	«FOR task : ifTasks»
         					«task.generateTaskItem»
         					«ENDFOR»
 			            }
 			        }
-				)
+			    )
 				«IF elseTasks !== null»
 				.setElseTaskItems(
 					new IConditionTasks() {
@@ -275,8 +283,8 @@ class MissionGeneratorGenerator {
         					«ENDFOR»
 						}
 					}
-				));
-				«ENDIF»
+				)«ENDIF»
+				);
 		'''
 	}
 	

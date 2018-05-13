@@ -49,37 +49,136 @@ class ModelGenerator {
 	}
 	
 	def generateModels() {
-		fsa.generateFile('/src/robotdefinitionsample/models/Shelf.java', shelfModel)
-		fsa.generateFile('/src/robotdefinitionsample/models/Vector2.java', vectorModel)
-		fsa.generateFile('/src/robotdefinitionsample/models/Property.java', PropertyModel)
-		fsa.generateFile('/src/robotdefinitionsample/models/Obstacle.java', ObstacleModel)
-		fsa.generateFile('/src/robotdefinitionsample/models/Robot.java', RobotModel)
+		fsa.generateFile('/src/robotdefinitionsample/RobotDefinitionSample.java', main)
+		fsa.generateFile('/src/robotdefinitionsample/DesiredProps.java', DesiredProps)
+		fsa.generateFile('/src/robotdefinitionsample/ObstacleDetection.java', ObstacleDetection)
 		fsa.generateFile('/src/robotdefinitionsample/models/ActionCondition.java', ActionCondition)
+		fsa.generateFile('/src/robotdefinitionsample/models/Obstacle.java', ObstacleModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Property.java', PropertyModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Robot.java', RobotModel)
+		fsa.generateFile('/src/robotdefinitionsample/models/Shelf.java', shelfModel)
 		fsa.generateFile('/src/robotdefinitionsample/models/Task.java', Task)
 		fsa.generateFile('/src/robotdefinitionsample/models/TaskItem.java', TaskItem)
-		fsa.generateFile('/src/robotdefinitionsample/RobotDefinitionSample.java', main)
+		fsa.generateFile('/src/robotdefinitionsample/models/Vector2.java', vectorModel)
 		
 	}
 	
-	def TaskItem() {
-		//«FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR»
+	def DesiredProps() {
 		'''
-		/*
-		 * To change this license header, choose License Headers in Project Properties.
-		 * To change this template file, choose Tools | Templates
-		 * and open the template in the editor.
-		 */
+		package robotdefinitionsample;
+		
+		import robotdefinitionsample.models.Vector2;
+		
+		public class DesiredProps {
+		    
+		    private Vector2 pos;
+		    private int rotation;
+		    private boolean discarded;
+		    private String shelfNameToPickUp;
+		
+		    public DesiredProps(Vector2 pos, int rotation) {
+		        this.pos = pos;
+		        this.rotation = rotation;
+		        this.discarded = false;
+		        this.shelfNameToPickUp = "";
+		    }
+		
+		    public Vector2 getPos() {
+		        return pos;
+		    }
+		
+		    public int getRotation() {
+		        return rotation;
+		    }
+		
+		    public boolean isDiscarded() {
+		        return discarded;
+		    }
+		
+		    public String getShelfNameToPickUp() {
+		        return shelfNameToPickUp;
+		    }
+		
+		    public void setPos(int x, int y) {
+		        this.pos = new Vector2(x, x);
+		    }
+		    
+		    public void setPos(Vector2 pos) {
+		        this.pos = pos;
+		    }
+		
+		    public void setRotation(int rotation) {
+		        this.rotation = rotation;
+		    }
+		
+		    public void setDiscarded(boolean discarded) {
+		        this.discarded = discarded;
+		    }
+		
+		    public void setShelfNameToPickUp(String shelfNameToPickUp) {
+		        this.shelfNameToPickUp = shelfNameToPickUp;
+		    }
+		    
+		}
+		'''
+	}
+	
+	def ObstacleDetection() {
+		'''
+		package robotdefinitionsample;
+		
+		import javafx.scene.Node;
+		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.models.Obstacle;
+		import robotdefinitionsample.models.Shelf;
+		import robotdefinitionsample.models.Vector2;
+		
+		public class ObstacleDetection {
+		    public static boolean detect(GridPane grid, DesiredProps props) {
+		        int x = props.getPos().getX();
+		        int y = props.getPos().getY();
+		        
+		        for(Node node : grid.getChildren()) {
+		            if (node instanceof Obstacle) {
+		                Vector2 pos = ((Obstacle) node).getPos();
+		                if (pos.getX() == x && pos.getY() == y) {
+		                    return true;
+		                }
+		            }
+		        }
+		        return false;
+		    }
+		    
+		    public static Shelf getShelfAtPos(GridPane grid, DesiredProps props) {
+		        int x = props.getPos().getX();
+		        int y = props.getPos().getY();
+		        for(Node node : grid.getChildren()) {
+		            if (node instanceof Shelf) {
+		                Vector2 pos = ((Shelf) node).getPos();
+		                if (pos.getX() == x && pos.getY() == y) {
+		                    return (Shelf) node;
+		                }
+		            }
+		        }
+		        return null;
+		    }
+		}
+		'''
+	}
+	
+	def TaskItem() {
+		'''
 		package robotdefinitionsample.models;
 		
+		import robotdefinitionsample.interfaces.ICondition;
+		import robotdefinitionsample.interfaces.IConditionTasks;
+		import java.util.ArrayList;
+		import java.util.List;
 		import robotdefinitionsample.DesiredProps;
 		import robotdefinitionsample.exceptions.InvalidMove;
 		import robotdefinitionsample.exceptions.NoShelfPickedUp;
 		
-		/**
-		 *
-		 * @author ditlev
-		 */
-		class TaskItem {
+		public class TaskItem {
 		    
 		    //Direction values
 		    private final int right = 0;
@@ -94,8 +193,8 @@ class ModelGenerator {
 		    private String atShelfName;
 		    private String shelfToPickUp;
 		    private ICondition conditionChecker;
-		    private TaskItem[] ifTaskItems;
-		    private TaskItem[] elseTaskItems;
+		    private List<TaskItem> ifTaskItems;
+		    private List<TaskItem> elseTaskItems;
 		    
 		    public TaskItem(Robot robot, ActionCondition ac) {
 		        this.robot = robot;
@@ -108,7 +207,7 @@ class ModelGenerator {
 		        return ac;
 		    }
 		    
-		    public void executeCommand(DesiredProps props) throws NoShelfPickedUp, InvalidMove, Exception, «FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR» {
+		    public void executeCommand(DesiredProps props) throws NoShelfPickedUp, InvalidMove, Exception {
 		        //Maybe some general code can be done here.
 		        
 		        switch (ac) {
@@ -273,9 +372,9 @@ class ModelGenerator {
 		        done = true;
 		    }
 		    
-		    private void conditionProcessTasks(TaskItem[] items, DesiredProps props) throws Exception {
-		        for (int i=0; i<items.length; i++) {
-		            TaskItem ti = items[i];
+		    private void conditionProcessTasks(List<TaskItem> items, DesiredProps props) throws Exception {
+		        for (int i=0; i<items.size(); i++) {
+		            TaskItem ti = items.get(i);
 		            if (i == 0) {
 		                ti.executeCommand(props);
 		            } else {
@@ -289,13 +388,17 @@ class ModelGenerator {
 		        return this;
 		    }
 		
-		    public TaskItem setIfTaskItems(TaskItem... ifTaskItems) {
-		        this.ifTaskItems = ifTaskItems;
+		    public TaskItem setIfTaskItems(IConditionTasks tasks) {
+		        List<TaskItem> list = new ArrayList<>();
+		        tasks.addTasks(list);
+		        this.ifTaskItems = list;
 		        return this;
 		    }
 		
-		    public TaskItem setElseTaskItems(TaskItem...elseTaskItems) {
-		        this.elseTaskItems = elseTaskItems;
+		    public TaskItem setElseTaskItems(IConditionTasks tasks) {
+		        List<TaskItem> list = new ArrayList();
+		        tasks.addTasks(list);
+		        this.elseTaskItems = list;
 		        return this;
 		    }
 		
@@ -314,17 +417,11 @@ class ModelGenerator {
 		        }
 		    }
 		}
-
 		'''
 	}
 	
 	def Task() {
 		'''
-		/*
-		 * To change this license header, choose License Headers in Project Properties.
-		 * To change this template file, choose Tools | Templates
-		 * and open the template in the editor.
-		 */
 		package robotdefinitionsample.models;
 		
 		import java.util.ArrayList;
@@ -332,12 +429,7 @@ class ModelGenerator {
 		import robotdefinitionsample.DesiredProps;
 		import robotdefinitionsample.exceptions.InvalidMove;
 		import robotdefinitionsample.exceptions.NoShelfPickedUp;
-		import robotdefinitionsample.exceptions.PropertyNotSet;
 		
-		/**
-		 *
-		 * @author ditlev
-		 */
 		public class Task {
 		    private String name;
 		    private List<TaskItem> items;
@@ -364,7 +456,7 @@ class ModelGenerator {
 		        this.shouldRetry = false;
 		    }
 		    
-		    public Task addTask(TaskItem item) {
+		    public Task add(TaskItem item) {
 		        items.add(item);
 		        return this;
 		    }
@@ -373,10 +465,10 @@ class ModelGenerator {
 		        return done;
 		    }
 		    
-		    public void executeNext(DesiredProps props) throws InvalidMove, NoShelfPickedUp, «FOR term : resource.allContents.filter(Terminatable).toList SEPARATOR ", "»«term.name»«ENDFOR» {
+		    public void executeNext(DesiredProps props) throws InvalidMove, NoShelfPickedUp, Exception {
 		        TaskItem currentTaskItem = items.get(currentTask);
 		        if (!shouldRetry) {
-		            while(currentTaskItem.isDone()) {
+		            while(currentTaskItem.isDone() && currentTask < items.size() - 1) {
 		                currentTask++;
 		                currentTaskItem = items.get(currentTask);
 		            }    
@@ -388,7 +480,7 @@ class ModelGenerator {
 		        
 		        currentTaskItem.executeCommand(props);
 		        
-		        if (currentTask == items.size()) {
+		        if (currentTask == items.size() - 1) {
 		            done = true;
 		        }
 		    }
@@ -403,10 +495,8 @@ class ModelGenerator {
 		
 		    void addTaskAtCurrent(TaskItem t) {
 		        items.add(currentTask + 1, t);
-		        System.out.println("Okay");
 		    }
 		}
-		
 		'''
 	}
 	
@@ -420,10 +510,6 @@ class ModelGenerator {
 		import javafx.scene.Scene;
 		import javafx.stage.Stage;
 		
-		/**
-		 *
-		 * @author ditlev
-		 */
 		public class RobotDefinitionSample extends Application {
 		    
 		    @Override
@@ -435,10 +521,7 @@ class ModelGenerator {
 		        stage.setScene(scene);
 		        stage.show();
 		    }
-		
-		    /**
-		     * @param args the command line arguments
-		     */
+			
 		    public static void main(String[] args) {
 		        launch(args);
 		    }
@@ -450,24 +533,17 @@ class ModelGenerator {
 		'''
 		package robotdefinitionsample.models;
 		
-		/**
-		 *
-		 * @author ditlev
-		 */
 		public enum ActionCondition {
 		    PICKUP,
-		    FORWARD,
-		    BACKWARD,
-		    TURN_CW,
-		    TURN_CCW,
-		    DO,
-		    TERMINATE,
-		    CONDITIONAT,
-		    CONDITIONPICKEDUP,
-		    CONDITIONRETRIES
-		    
+			FORWARD,
+			BACKWARD,
+			TURN_CW,
+			TURN_CCW,
+			DO,
+			TERMINATE,
+			CONDITION,
+			CONDITIONAT
 		}
-		
 		'''
 	}
 	
@@ -476,15 +552,23 @@ class ModelGenerator {
 		'''
 		package robotdefinitionsample.models;
 		
+		import javafx.scene.control.Alert;
 		import javafx.scene.control.Label;
+		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.DesiredProps;
+		import robotdefinitionsample.ObstacleDetection;
+		import robotdefinitionsample.interfaces.IMoveable;
 		
-		public class Robot extends Label {
+		public class Robot extends Label implements IMoveable {
 		    private Vector2 pos;
 		    private Mission mission;
+		    private String name;
+		    private Shelf pickedUpshelf;
 		
 		    public Robot(String name, Vector2 startpoint) {
-		        super(name);
+		        super();
 		        this.pos = startpoint;
+		        this.name = name;
 		    }
 		    
 		    public void setMission(Mission m) {
@@ -492,7 +576,7 @@ class ModelGenerator {
 		    }
 		
 		    public String getName() {
-		        return this.getText();
+		        return name;
 		    }
 		    
 		    public Vector2 getPos() {
@@ -503,9 +587,52 @@ class ModelGenerator {
 		        return mission;
 		    }
 		    
-		    public void execute() {
-		        Task t = mission.getNextTask();
-		        t.executeTaskItem();
+		    public void setPos(Vector2 pos) {
+		        this.pos = pos;
+		    }
+		    
+		    public Shelf getShelf() {
+		        return pickedUpshelf;
+		    }
+		
+		    @Override
+		    public void execute(GridPane grid) {
+		        if (mission.isDone()) {
+		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		            alert.setTitle("No more tasks");
+		            alert.setHeaderText("No more tasks");
+		            alert.setContentText("The robot \"" + getName() + "\" has no more tasks in its mission to execute.");
+		            alert.showAndWait();
+		        } else if (mission.getFailed()) {
+		            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		            alert.setTitle("Failed");
+		            alert.setHeaderText("The mission failed");
+		            alert.setContentText("The robot \"" + getName() + "\" execution failed");
+		            alert.showAndWait();
+		        } else {
+		            DesiredProps props = new DesiredProps(getPos(), (int)getRotate());
+		            mission.executeNext(props);
+		            if (!props.isDiscarded()) {
+		                setPos(props.getPos());
+		                setRotate(props.getRotation());
+		                if(ObstacleDetection.getShelfAtPos(grid, props) != null) {
+		                    if(ObstacleDetection.getShelfAtPos(grid, props).getName().equals(props.getShelfNameToPickUp())) {
+		                        if(pickedUpshelf == null) {
+		                            pickedUpshelf = ObstacleDetection.getShelfAtPos(grid, props);
+		                        }
+		                    }
+		                }
+		                if(pickedUpshelf != null){
+		                    pickedUpshelf.setPos(props.getPos());
+		                }
+		            }
+		        }
+		    }
+		
+		    @Override
+		    public void move(GridPane grid) {
+		        grid.getChildren().remove(this);
+		        grid.add(this, this.getPos().getX(), this.getPos().getY());
 		    }
 		}
 		'''
@@ -516,8 +643,10 @@ class ModelGenerator {
 		package robotdefinitionsample.models;
 		
 		import javafx.scene.control.Label;
+		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.interfaces.IMoveable;
 		
-		public class Obstacle extends Label {
+		public class Obstacle extends Label implements IMoveable {
 		    private Vector2 pos;
 		    private Vector2 size;
 		
@@ -527,10 +656,6 @@ class ModelGenerator {
 		        this.size = size;
 		    }
 		
-		    public String getName() {
-		        return this.getText();
-		    }
-		
 		    public Vector2 getPos() {
 		        return pos;
 		    }
@@ -538,7 +663,12 @@ class ModelGenerator {
 		    public Vector2 getSize() {
 		        return size;
 		    }
-		    
+		
+		    @Override
+		    public void execute(GridPane grid) { }
+		
+		    @Override
+		    public void move(GridPane grid) { }
 		}
 		'''
 	}
@@ -570,7 +700,6 @@ class ModelGenerator {
 	
 	def vectorModel() {
 		'''
-		
 		package robotdefinitionsample.models;
 		
 		public class Vector2 {
@@ -597,7 +726,16 @@ class ModelGenerator {
 		    public void setX(int x) {
 		        this.x = x;
 		    }
+		    
+		    public Vector2 add(int x, int y) {
+		        return new Vector2(this.x + x, this.y + y);
+		    }
+		    
+		    public Vector2 add(Vector2 pos) {
+		        return new Vector2(this.x + pos.getX(), this.y + pos.getY());
+		    }
 		}
+
 		'''
 	}
 	
@@ -610,34 +748,53 @@ class ModelGenerator {
 		import java.util.HashMap;
 		import java.util.Map;
 		import javafx.scene.control.Label;
+		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.interfaces.IMoveable;
 		
-		public class Shelf {
-		    private String name;
+		public class Shelf extends Label implements IMoveable {
 		    private Vector2 pos;
 		    private Map<String, Property> properties;
 		
 		    public Shelf(String name, Vector2 pos) {
-		        this.name = name;
+		        super(name);
 		        this.pos = pos;
 		        this.properties = new HashMap<>();
 		    }
 		
+		    
 		    public String getName() {
-		        return name;
+		        return this.getText();
 		    }
 		
 		    public Vector2 getPos() {
 		        return pos;
 		    }
+		
+		    public Map<String, Property> getShelfProperties() {
+		        return properties;
+		    }
 		    
 		    public Property getProperty(String key){
 		        return properties.get(key);
+		    }
+		
+		    public void setPos(Vector2 pos) {
+		        this.pos = pos;
 		    }
 		    
 		    public void addProperty(String name, Property p) {
 		        properties.put(name, p);
 		    }
-		    
+		
+		    @Override
+		    public void execute(GridPane grid) { }
+		
+		    @Override
+		    public void move(GridPane grid) {
+		        grid.getChildren().remove(this);
+		        grid.add(this, this.getPos().getX(), this.getPos().getY());
+		        System.out.println("X: " + this.getPos().getX() + " Y: " + this.getPos().getY());
+		    }
 		}
 		'''
 	}

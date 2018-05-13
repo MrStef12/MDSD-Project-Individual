@@ -24,7 +24,7 @@ class ExceptionGenerator {
 		for (Terminatable t : terminatables.terms)
 			fsa.generateFile("/src/robotdefinitionsample/exceptions/" + t.name + ".java", t.name.generateException)
 		
-		var staticExceptions = #["InvalidMove", "PropertyNotSet", "NoShelfPickedUp"];
+		var staticExceptions = #["InvalidMove", "NoShelfPickedUp"];
 		for (String s : staticExceptions) {
 			fsa.generateFile("/src/robotdefinitionsample/exceptions/" + s + ".java", s.generateException);
 		}

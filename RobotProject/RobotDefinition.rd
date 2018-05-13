@@ -1,12 +1,12 @@
 production MainTerminal
 
-area ProductionFloor size 10 20
+area ProductionFloor size 10 10
 	obstacle Pole
 		pos 2 2
 		size 1 1
 	endobstacle
 	shelf TestShelf
-		pos 20 20
+		pos 0 2
 		property PhysicalWeight default 100
 	endshelf
 endarea
@@ -14,15 +14,18 @@ endarea
 terminatable WeightTooHigh
 
 task goToShelf
-	forward 20
+	turn right
+	forward 2
 	if at TestShelf
+		pickup
+		turn right
+		forward 1
 		turn left
-		backward 10
+		forward 2
+		turn right
 	else
 		turn right
 	endif
-	
-		do driveShelf
 endtask
 
 task driveShelf
@@ -38,16 +41,13 @@ task driveShelf
 endtask
 
 robot Rob1 in ProductionFloor
-	startpoint 20 10
+	startpoint 0 0
 	mission
 		goToShelf terminated {
 			WeightTooHigh {
-				if retries < 100
-					retry
-				else
-					do goToShelf
-				endif
-				// other things
+				forward 1
+				forward 10
+				do driveShelf
 			}
 			// other terminatables
 		}

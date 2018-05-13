@@ -5,12 +5,10 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import dk.sdu.mmmi.mdsd.project.dSL.Area
 import dk.sdu.mmmi.mdsd.project.dSL.Robot
-import org.eclipse.emf.ecore.EObject
 import java.util.List
 import dk.sdu.mmmi.mdsd.project.dSL.Shelf
 import dk.sdu.mmmi.mdsd.project.dSL.AreaItem
 import dk.sdu.mmmi.mdsd.project.dSL.Obstacle
-import dk.sdu.mmmi.mdsd.project.dSL.Mission
 
 class ControllerGenerator {
 	Resource resource;
@@ -26,16 +24,10 @@ class ControllerGenerator {
 	
 	def void generateArea(IFileSystemAccess2 fsa, Resource resource) {
 		var area = resource.allContents.filter(Area).next;
-		
-		
-		fsa.generateFile('/src/robotdefinitionsample/' + area.name + 'Controller.java', generateController(area) );
-		
-		
+		fsa.generateFile('/src/robotdefinitionsample/' + area.name + 'Controller.java', area.generateController);
 	}
 	
 	def generateController(Area area) {
-		
-		
 		'''
 		package robotdefinitionsample;
 		
@@ -47,7 +39,10 @@ class ControllerGenerator {
 		import javafx.fxml.FXML;
 		import javafx.fxml.Initializable;
 		import javafx.scene.control.Button;
+		import javafx.scene.image.Image;
+		import javafx.scene.image.ImageView;
 		import javafx.scene.layout.GridPane;
+		import robotdefinitionsample.interfaces.IMoveable;
 		import robotdefinitionsample.models.MissionGenerator;
 		import robotdefinitionsample.models.Obstacle;
 		import robotdefinitionsample.models.Robot;
@@ -57,40 +52,29 @@ class ControllerGenerator {
 		public class «area.name»Controller implements Initializable {
 		    
 		    @FXML
-		    private GridPane grid;
-		    @FXML
-		    private Button Tick;
-		    
-		    private List<Robot> robots;
-		    private List<Obstacle> obstacles;
-		    private List<Shelf> shelfs;
+			private GridPane grid;
+			@FXML
+			private Button Tick;
+			
+			private List<IMoveable> moveables;
 		
 		
 			@Override
 			public void initialize(URL url, ResourceBundle rb) {
-				robots = new ArrayList<>();
-				obstacles = new ArrayList<>();
-				shelfs = new ArrayList<>();
+				moveables = new ArrayList<>();
 				MissionGenerator generator = new MissionGenerator();
+				Image image = new Image(getClass().getResourceAsStream("robot.png"));
 				
-				«robots(area.name)»
-		        «generateItems(area.items)»
-		        
-		        Robot r = new Robot("name", new Vector2(0,0));
-		        r.setMission(generator.Robot1(r));
-		
-				robots.add(r);
-				
-				grid.add(r, r.getPos().getX(), r.getPos().getY());
+				«generateRobots»
+		        «area.items.generateItems»
 		    }
 		
 		    private void tick() {
-		        for (Robot r : robots) {
-		            r.execute();
-		            grid.getChildren().remove(r);
-		            grid.add(r, r.getPos().getX(), r.getPos().getY());
-		        }
-		    }
+			    for (IMoveable m : moveables) {
+			        m.execute(grid);
+			        m.move(grid);
+			    }
+			}
 		
 		    @FXML
 		    private void onClick(ActionEvent event) {
@@ -101,59 +85,46 @@ class ControllerGenerator {
 	}
 	
 	
-	def robots(String AreaName) {
-		
-		var robots = resource.allContents.filter[r |
-			if (r instanceof Robot) {
-				return r.area.name.equals(AreaName);
-			}
-			false
-		].toList
-		
+	def generateRobots() {
+		var robots = resource.allContents.filter(Robot).toList
 		'''
-		«instanciateObjects(robots)»
+		«FOR robot : robots»
+		«robot.construct»
+		«ENDFOR»
 		'''
-		
 	}
 	
 	def generateItems(List<AreaItem> items) {
 		'''
 		«FOR i : items»
-		«construct(i)»
-		«ENDFOR»
-		'''
-	}
-	
-	def instanciateObjects(List<EObject> objects) {
-		'''
-		«FOR i : objects»
-		«construct(i)»
+		«i.construct»
 		«ENDFOR»
 		'''
 	}
 	
 	def dispatch construct(Robot r) {
 		'''
-		Robot «r.name» = new Robot(«r.name», new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
-		«generateMission(r)»
-		'''
-	}
-	
-	def generateMission(Robot r) {
-		'''
-		«r.name».setMission(generate.«r.name»(r));
+		Robot robot_«r.name» = new Robot("«r.name»", new Vector2(«r.startpoint.pos.x», «r.startpoint.pos.y»));
+		robot_«r.name».setMission(generator.«r.name»(robot_«r.name», grid));
+		robot_«r.name».setGraphic(new ImageView(image));
+		moveables.add(robot_«r.name»);
+		grid.add(robot_«r.name», «r.startpoint.pos.x», «r.startpoint.pos.y»);
 		'''
 	}
 	
 	def dispatch construct(Shelf s) {
 		'''
-		Shelf S«s.name» = new Shelf(«s.name», new Vector2(«s.pos.x», «s.pos.y»));
+		Shelf shelf_«s.name» = new Shelf("«s.name»", new Vector2(«s.pos.x», «s.pos.y»));
+		moveables.add(shelf_«s.name»);
+		grid.add(shelf_«s.name», «s.pos.x», «s.pos.y»);
 		'''
 	}
 	
 	def dispatch construct(Obstacle o) {
 		'''
-		Obstacle O«o.name» = new Obstacle(«o.name», new Vector2(«o.pos.x», «o.pos.y»), new Vector2(«o.size.x», «o.size.y»));
+		Obstacle obstacle_«o.name» = new Obstacle("«o.name»", new Vector2(«o.pos.x», «o.pos.y»), new Vector2(«o.size.x», «o.size.y»));
+		moveables.add(obstacle_«o.name»);
+		grid.add(obstacle_«o.name», «o.pos.x», «o.pos.y»);
 		'''
 	}
 	
