@@ -261,40 +261,41 @@ class MissionGeneratorGenerator {
 		val ifTasks = condition.tasks;
 		val elseTasks = if(condition.getElse !== null) condition.getElse.tasks;
 		'''
-			items.add(new TaskItem(r, ActionCondition.CONDITION)
-				«condition.state.generateState»
-				.setIfTaskItems(
-					new IConditionTasks() {
-			            @Override
-			            public void addTasks(List<TaskItem> items) {
-			            	«FOR task : ifTasks»
-        					«task.generateTaskItem»
-        					«ENDFOR»
-			            }
-			        }
-			    )
-				«IF elseTasks !== null»
-				.setElseTaskItems(
-					new IConditionTasks() {
-						@Override
-						public void addTasks(List<TaskItem> items) {
-        					«FOR task : elseTasks»
-        					«task.generateTaskItem»
-        					«ENDFOR»
-						}
+			«condition.state.generateState»
+			.setIfTaskItems(
+				new IConditionTasks() {
+					@Override
+					public void addTasks(List<TaskItem> items) {
+		            	«FOR task : ifTasks»
+    					«task.generateTaskItem»
+    					«ENDFOR»
 					}
-				)«ENDIF»
-				);
+				}
+			)
+			«IF elseTasks !== null»
+			.setElseTaskItems(
+				new IConditionTasks() {
+					@Override
+					public void addTasks(List<TaskItem> items) {
+    					«FOR task : elseTasks»
+    					«task.generateTaskItem»
+    					«ENDFOR»
+					}
+				}
+			)«ENDIF»
+			);
 		'''
 	}
 	
 	def dispatch generateState(StateAt stateAt) 
 	'''
+	items.add(new TaskItem(r, ActionCondition.CONDITIONAT)
 		.setAtShelfName("«stateAt.shelf.name»")
 	'''
 	
 	def dispatch generateState(StatePickedUp state)
 	'''
+	items.add(new TaskItem(r, ActionCondition.CONDITION)
 		.setConditionChecker(new ICondition() {
 		    @Override
 			public boolean checkCondition(int retries, Shelf shelf, Map<String, Property> properties) {
@@ -305,6 +306,7 @@ class MissionGeneratorGenerator {
 	
 	def dispatch generateState(Expression state)
 	'''
+	items.add(new TaskItem(r, ActionCondition.CONDITION)
 		.setConditionChecker(new ICondition() {
 		    @Override
 			public boolean checkCondition(int retries, Shelf shelf, Map<String, Property> properties) {

@@ -18,13 +18,24 @@ task goToShelf
 	forward 2
 	if at TestShelf
 		pickup
-		turn right
+		turn left
 		forward 1
 		turn left
 		forward 2
 		turn right
 	else
 		turn right
+	endif
+endtask
+
+task turnTest
+	turn right
+	forward 2
+	if at TestShelf
+		pickup
+		turn left
+	else
+		forward 5
 	endif
 endtask
 
@@ -43,14 +54,6 @@ endtask
 robot Rob1 in ProductionFloor
 	startpoint 0 0
 	mission
-		goToShelf terminated {
-			WeightTooHigh {
-				forward 1
-				forward 10
-				do driveShelf
-			}
-			// other terminatables
-		}
-		driveShelf
+		goToShelf
 	endmission
 endrobot

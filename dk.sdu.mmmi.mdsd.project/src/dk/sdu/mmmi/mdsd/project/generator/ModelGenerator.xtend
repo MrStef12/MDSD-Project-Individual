@@ -373,7 +373,7 @@ class ModelGenerator {
 		    }
 		    
 		    private void conditionProcessTasks(List<TaskItem> items, DesiredProps props) throws Exception {
-		        for (int i=0; i<items.size(); i++) {
+		        for (int i=items.size()-1; i>=0; i--) {
 		            TaskItem ti = items.get(i);
 		            if (i == 0) {
 		                ti.executeCommand(props);
