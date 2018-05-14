@@ -11,7 +11,7 @@ area ProductionFloor size 10 10
 	endshelf
 endarea
 
-terminatable WeightTooHigh
+terminatable WeightTooHigh, NotAtRightPlace
 
 task goToShelf
 	turn right
@@ -24,18 +24,7 @@ task goToShelf
 		forward 2
 		turn right
 	else
-		turn right
-	endif
-endtask
-
-task turnTest
-	turn right
-	forward 2
-	if at TestShelf
-		pickup
-		turn left
-	else
-		forward 5
+		terminate NotAtRightPlace
 	endif
 endtask
 
@@ -51,9 +40,13 @@ task driveShelf
 	endif
 endtask
 
-robot Rob1 in ProductionFloor
+robot Rob1
 	startpoint 0 0
 	mission
-		goToShelf
+		goToShelf terminated {
+			NotAtRightPlace {
+				forward 4
+			}
+		}
 	endmission
 endrobot

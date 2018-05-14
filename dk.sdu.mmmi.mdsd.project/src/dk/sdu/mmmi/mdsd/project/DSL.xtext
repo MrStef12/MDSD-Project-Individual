@@ -111,7 +111,7 @@ StateVars returns Expression:
 ;
 
 Robot:
-	'robot' name=ID 'in' area=[Area] startpoint=StartPoint mission=Mission 'endrobot'
+	'robot' name=ID startpoint=StartPoint mission=Mission 'endrobot'
 ;
 
 StartPoint:
