@@ -3,12 +3,10 @@
  */
 package dk.sdu.mmmi.mdsd.project.validation
 
-import dk.sdu.mmmi.mdsd.project.dSL.Shelf
 import org.eclipse.xtext.EcoreUtil2
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage
 import org.eclipse.xtext.validation.Check
-import dk.sdu.mmmi.mdsd.project.dSL.Terminatable
-import dk.sdu.mmmi.mdsd.project.dSL.TaskTerminated
+import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
 
 /**
  * This class contains custom validation rules. 
@@ -22,11 +20,11 @@ class DSLValidator extends AbstractDSLValidator {
 	public static val INVALID_TERMINATABLE = "Two terminatables handlers can't have the same name";
 	
 	@Check(FAST)
-	def checkNames(Shelf s) {
+	def checkNames(Pickupable s) {
 		val container = EcoreUtil2.getRootContainer(s);
-		val cand = EcoreUtil2.getAllContentsOfType(container, Shelf);
+		val cand = EcoreUtil2.getAllContentsOfType(container, Pickupable);
 		
-		for (Shelf myS : cand) {
+		for (Pickupable myS : cand) {
 			
 			if (s != myS) {
 				if (s.name.equals(myS.name)) {
@@ -37,18 +35,5 @@ class DSLValidator extends AbstractDSLValidator {
 		}
 	}
 	
-	@Check(FAST)
-	def checkTerminatable(TaskTerminated t) {
-		val container = EcoreUtil2.getRootContainer(t)
-		val cand = EcoreUtil2.getAllContentsOfType(container, TaskTerminated)
-		
-		for (TaskTerminated myT : cand) {
-			if (t != myT) {
-				if (t.terminatable.name.equals(myT.terminatable.name)) {
-					error(INVALID_TERMINATABLE, DSLPackage.Literals.TASK_TERMINATED__TERMINATABLE);
-				}
-			}
-		}
-	}
-	
+	def checkWaitIsNotItself()
 }

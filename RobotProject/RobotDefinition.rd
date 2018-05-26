@@ -1,52 +1,37 @@
-production MainTerminal
+RobotDefinition for MainTerminal
 
 area ProductionFloor size 10 10
 	obstacle Pole
 		pos 2 2
 		size 1 1
 	endobstacle
-	shelf TestShelf
+	pickupable TestShelf
 		pos 0 2
 		property PhysicalWeight default 100
-	endshelf
+	endpickupable
 endarea
 
-terminatable WeightTooHigh, NotAtRightPlace
-
-task goToShelf
-	turn right
-	forward 2
-	if at TestShelf
-		pickup
-		turn left
-		forward 1
-		turn left
-		forward 2
-		turn right
-	else
-		terminate NotAtRightPlace
-	endif
-endtask
-
-task driveShelf
+task driveShelfToLeft
 	pickup
-	if at TestShelf
-		if pickedUp PhysicalWeight < 130
-			turn left
-			backward 20
-		else
-			terminate WeightTooHigh
-		endif
-	endif
+	turn left
+	forward 3
+	setdown
+	backward 3
+	turn right
 endtask
 
 robot Rob1
 	startpoint 0 0
+	path
+		forward 10
+		turn left
+		forward 2
+	endpath
 	mission
-		goToShelf terminated {
-			NotAtRightPlace {
-				forward 4
-			}
-		}
+		when at pos 2 3
+			wait for 2 seconds
+			wait until robot Rob1 at 2 3 for for 1 minutes or cancel
+			do driveShelfToLeft
+		end
 	endmission
 endrobot

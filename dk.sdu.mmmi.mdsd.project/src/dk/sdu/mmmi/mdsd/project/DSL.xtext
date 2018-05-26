@@ -2,8 +2,8 @@ grammar dk.sdu.mmmi.mdsd.project.DSL with org.eclipse.xtext.common.Terminals
 
 generate dSL "http://www.sdu.dk/mmmi/mdsd/project/DSL"
 
-Production:
-	'production' name=ID area=Area terminatables+=TerminatableDef* tasks+=Task+ robots+=Robot+
+RobotDefinition:
+	'RobotDefinition' 'for' name=ID area=Area tasks+=Task+ robots+=Robot+
 ;
 
 Area:
@@ -15,11 +15,11 @@ Vector2:
 ;
 
 AreaItem:
-	Shelf | Obstacle
+	Pickupable | Obstacle
 ;
 
-Shelf:
-	'shelf' name=ID 'pos' pos=Vector2 properties+=Property* 'endshelf'
+Pickupable:
+	'pickupable' name=ID 'pos' pos=Vector2 properties+=Property* 'endpickupable'
 ;
 
 Obstacle:
@@ -28,14 +28,6 @@ Obstacle:
 
 Property:
 	'property' name=ID 'default' default=INT
-;
-
-TerminatableDef:
-	'terminatable' terms+=Terminatable (',' terms+=Terminatable)*
-;
-
-Terminatable:
-	name=ID
 ;
 
 Task:
@@ -48,20 +40,16 @@ TaskItem:
 
 Action:
 	{Pickup} 'pickup' 
+	| {Setdown} 'setdown'
 	| {Forward} 'forward' amount=INT
 	| {Backward} 'backward' amount=INT
 	| {Turn} 'turn' direction=Direction
 	| {Retry} 'retry'
 	| {DoTask} 'do' task=[Task]
-	| Terminate
 ;
 
 Direction:
 	{LeftDir} 'left' | {RightDir} 'right'
-;
-
-Terminate:
-	'terminate' name=[Terminatable]
 ;
 
 Condition:
@@ -69,8 +57,8 @@ Condition:
 ;
 
 State returns Expression:
-	{StateAt} 'at' shelf=[Shelf]
-	| {StatePickedUp} 'pickedUp' prop=[Property] sign=Sign right=Exp
+	{StateAt} 'at' pickupable=[Pickupable]
+	| {StatePickedUp} 'picked' 'up' prop=[Property] sign=Sign right=Exp
 	| Exp {State.left = current} sign=Sign right=Exp
 ;
 
@@ -111,21 +99,65 @@ StateVars returns Expression:
 ;
 
 Robot:
-	'robot' name=ID startpoint=StartPoint mission=Mission 'endrobot'
+	'robot' name=ID startpoint=StartPoint path=Path mission=Mission 'endrobot'
 ;
 
 StartPoint:
 	'startpoint' pos=Vector2
 ;
 
+Path:
+	{Path} 'path' items+=TaskItem* 'endpath'
+;
+
 Mission:
-	{Mission} 'mission' tasks+=MissionTask* 'endmission'
+	{Mission} 'mission' triggers+=WhenTrigger* 'endmission'
 ;
 
-MissionTask:
-	task=[Task] ('terminated' '{' terminated=TaskTerminated '}')?
+MissionTriggerAction:
+	WhenTrigger | WaitAction | TaskItem
 ;
 
-TaskTerminated:
-	terminatable=[Terminatable] '{' items+=TaskItem* '}'
+WhenTrigger:
+	'when' 'at' trigger=WhenAtTrigger items+=MissionTriggerAction* 'end'
 ;
+
+WhenAtTrigger:
+	{WhenAtPickupable} 'pickupable' pickupable=[Pickupable]
+	| {WhenAtPos} 'pos' pos=Vector2
+;
+
+WaitAction:
+	'wait' (ForTime | 'until' Until)
+;
+
+ForTime:
+	'for' time=Time
+;
+
+Until:
+	({UntilRobot} 'robot' robot=[Robot] | {UntilPickupable} 'pickupable' pickupable=[Pickupable])
+	'at' pos=Vector2 (time=ForTime 'or' or=Or)?
+;
+
+Time:
+	{Seconds} time=INT 'seconds'
+	| {Minutes} time=INT 'minutes'
+;
+
+Or:
+	{Cancel} 'cancel'
+	| {Terminate} 'terminate'
+;
+
+
+
+
+
+
+
+
+
+
+
+
