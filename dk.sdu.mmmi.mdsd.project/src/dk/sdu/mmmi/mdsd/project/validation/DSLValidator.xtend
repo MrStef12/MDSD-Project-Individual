@@ -4,9 +4,11 @@
 package dk.sdu.mmmi.mdsd.project.validation
 
 import org.eclipse.xtext.EcoreUtil2
-import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage
+import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
 import org.eclipse.xtext.validation.Check
 import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
+import dk.sdu.mmmi.mdsd.project.dSL.UntilRobot
+import dk.sdu.mmmi.mdsd.project.dSL.Robot
 
 /**
  * This class contains custom validation rules. 
@@ -28,12 +30,18 @@ class DSLValidator extends AbstractDSLValidator {
 			
 			if (s != myS) {
 				if (s.name.equals(myS.name)) {
-					error(INVALID_NAME,  DSLPackage.Literals.AREA_ITEM__NAME);
+					error(INVALID_NAME,  Literals.AREA_ITEM__NAME);
 				}
 			}
 
 		}
 	}
 	
-	def checkWaitIsNotItself()
+	@Check
+	def checkWaitIsNotItself(UntilRobot untilRobot) {
+		val robot = EcoreUtil2.getContainerOfType(untilRobot, Robot);
+		if (robot === untilRobot.robot) {
+			error('Robot cannot wait for itself', Literals.UNTIL_ROBOT__ROBOT)
+		}
+	}
 }

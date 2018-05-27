@@ -12,6 +12,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.scoping.Scopes
 import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
 import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
+import dk.sdu.mmmi.mdsd.project.dSL.WhenAtPickupable
 
 /**
  * This class contains custom scoping description.
@@ -21,7 +22,10 @@ import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
  */
 class DSLScopeProvider extends AbstractDSLScopeProvider {
 	override getScope(EObject context, EReference reference) {
-		if(context instanceof StateAt && reference == Literals.STATE_AT__PICKUPABLE) {
+		if(
+			(context instanceof StateAt && reference == Literals.STATE_AT__PICKUPABLE)
+			|| (context instanceof WhenAtPickupable && reference == Literals.WHEN_AT_PICKUPABLE__PICKUPABLE)
+		) {
 			val rootElement = EcoreUtil2.getRootContainer(context)
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Pickupable)
 			return Scopes.scopeFor(candidates)

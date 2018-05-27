@@ -30,8 +30,21 @@ robot Rob1
 	mission
 		when at pos 2 3
 			wait for 2 seconds
-			wait until robot Rob1 at 2 3 for for 1 minutes or cancel
+			wait until robot Rob2 at 2 3 for 1 minutes or cancel
 			do driveShelfToLeft
 		end
+		when at pickupable TestShelf
+			wait for 2 seconds
+		end
+	endmission
+endrobot
+
+robot Rob2
+	startpoint 2 2
+	path
+		
+	endpath
+	mission
+	
 	endmission
 endrobot
