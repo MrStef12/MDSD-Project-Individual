@@ -5,7 +5,6 @@ package dk.sdu.mmmi.mdsd.project.scoping
 
 import dk.sdu.mmmi.mdsd.project.dSL.DSLPackage.Literals
 import dk.sdu.mmmi.mdsd.project.dSL.Property
-import dk.sdu.mmmi.mdsd.project.dSL.StateAt
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.EcoreUtil2
@@ -13,6 +12,7 @@ import org.eclipse.xtext.scoping.Scopes
 import dk.sdu.mmmi.mdsd.project.dSL.StatePickedUp
 import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
 import dk.sdu.mmmi.mdsd.project.dSL.WhenAtPickupable
+import dk.sdu.mmmi.mdsd.project.dSL.UntilPickupable
 
 /**
  * This class contains custom scoping description.
@@ -23,8 +23,8 @@ import dk.sdu.mmmi.mdsd.project.dSL.WhenAtPickupable
 class DSLScopeProvider extends AbstractDSLScopeProvider {
 	override getScope(EObject context, EReference reference) {
 		if(
-			(context instanceof StateAt && reference == Literals.STATE_AT__PICKUPABLE)
-			|| (context instanceof WhenAtPickupable && reference == Literals.WHEN_AT_PICKUPABLE__PICKUPABLE)
+			(context instanceof WhenAtPickupable && reference == Literals.WHEN_AT_PICKUPABLE__PICKUPABLE)
+			|| (context instanceof UntilPickupable && reference == Literals.UNTIL_PICKUPABLE__PICKUPABLE)
 		) {
 			val rootElement = EcoreUtil2.getRootContainer(context)
 			val candidates = EcoreUtil2.getAllContentsOfType(rootElement, Pickupable)

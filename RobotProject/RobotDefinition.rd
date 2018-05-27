@@ -6,45 +6,51 @@ area ProductionFloor size 10 10
 		size 1 1
 	endobstacle
 	pickupable TestShelf
-		pos 0 2
+		pos 2 0
 		property PhysicalWeight default 100
 	endpickupable
 endarea
 
-task driveShelfToLeft
+task driveShelfToRight
 	pickup
+	if picked up PhysicalWeight > 99
+		backward 1
+		forward 1
+	else
+		forward 1
+		backward 1
+	endif
 	turn left
-	forward 3
+	forward 1
 	setdown
-	backward 3
+	backward 1
 	turn right
 endtask
 
 robot Rob1
 	startpoint 0 0
 	path
-		forward 10
-		turn left
-		forward 2
+		forward 5
 	endpath
 	mission
-		when at pos 2 3
-			wait for 2 seconds
-			wait until robot Rob2 at 2 3 for 1 minutes or cancel
-			do driveShelfToLeft
-		end
 		when at pickupable TestShelf
-			wait for 2 seconds
+			do driveShelfToRight
 		end
 	endmission
 endrobot
 
 robot Rob2
-	startpoint 2 2
+	startpoint 0 1
 	path
-		
+		forward 5
+		backward 2
 	endpath
 	mission
-	
+		when at pos 0 1
+			wait until pickupable TestShelf at 2 1 for 20 seconds or cancel
+		end
+		when at pickupable TestShelf
+			pickup
+		end 
 	endmission
 endrobot

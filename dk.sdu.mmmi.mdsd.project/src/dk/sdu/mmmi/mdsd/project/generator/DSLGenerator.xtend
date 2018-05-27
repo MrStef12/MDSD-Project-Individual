@@ -8,12 +8,6 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import java.util.zip.ZipInputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.util.zip.ZipFile
-import java.nio.file.Paths
-import java.net.URL
-import java.io.InputStreamReader
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
 
@@ -28,6 +22,10 @@ class DSLGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		fsa.unpackProject
+		
+		new GUIGenerator(resource, fsa, context)
+		new ControllerGenerator(resource, fsa, context)
+		new MissionGeneratorGenerator(resource, fsa, context)
 		
 		/*
 		new InterfaceGenerator(resource, fsa, context);
