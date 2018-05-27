@@ -62,9 +62,9 @@ class ControllerGenerator {
 		        MissionGenerator generator = new MissionGenerator();
 		        Image image = new Image(getClass().getResourceAsStream("robot.png"));
 		        
-		        «rd.area.items.generateItems»
-		        
 		        «rd.robots.generateRobots»
+		        
+		        «rd.area.items.generateItems»
 		    }
 		
 		    

@@ -20,11 +20,11 @@ task driveShelfToRight
 		forward 1
 		backward 1
 	endif
-	turn left
+	turn right
 	forward 1
 	setdown
 	backward 1
-	turn right
+	turn left
 endtask
 
 robot Rob1
