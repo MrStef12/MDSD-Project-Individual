@@ -9,6 +9,10 @@ import org.eclipse.xtext.validation.Check
 import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
 import dk.sdu.mmmi.mdsd.project.dSL.UntilRobot
 import dk.sdu.mmmi.mdsd.project.dSL.Robot
+import dk.sdu.mmmi.mdsd.project.dSL.DoTask
+import java.util.HashSet
+import dk.sdu.mmmi.mdsd.project.dSL.Task
+import java.util.Set
 
 /**
  * This class contains custom validation rules. 
@@ -42,6 +46,29 @@ class DSLValidator extends AbstractDSLValidator {
 		val robot = EcoreUtil2.getContainerOfType(untilRobot, Robot);
 		if (robot === untilRobot.robot) {
 			error('Robot cannot wait for itself', Literals.UNTIL_ROBOT__ROBOT)
+		}
+	}
+	
+	@Check
+	def checkTaskNoCyclicDo(DoTask doTask) {
+		var seen = new HashSet<String>
+		var task = EcoreUtil2.getContainerOfType(doTask, Task)
+		if (task.selfDo(seen)) {
+			error ('Cyclic do task', Literals.DO_TASK__TASK)
+		}
+	}
+	
+	def boolean selfDo(Task next, Set<String> seen) {
+		if (next === null) false
+		else if (seen.contains(next.name)) true
+		else { 
+			seen.add(next.name)
+			var dos = next.items.filter(DoTask)
+			for (doTask : dos) {
+				var result = doTask.task.selfDo(seen)
+				if (result) return true;
+			}
+			return false
 		}
 	}
 }

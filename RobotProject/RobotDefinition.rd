@@ -9,6 +9,10 @@ area ProductionFloor size 10 10
 		pos 2 0
 		property PhysicalWeight default 100
 	endpickupable
+	pickupable TestShelf2
+		pos 2 0
+		property PhysicalWeight default 200
+	endpickupable
 endarea
 
 task driveShelfToRight
