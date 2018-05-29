@@ -8,20 +8,7 @@ import dk.sdu.mmmi.mdsd.project.dSL.Area
 
 class GUIGenerator {
 
-	Resource resource;
-	IFileSystemAccess2 fsa;
-	IGeneratorContext context;
-
 	new (Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		this.resource = resource
-		this.fsa = fsa
-		this.context = context
-		
-		generateArea(fsa, resource)
-	}
-	
-	
-	def void generateArea(IFileSystemAccess2 fsa, Resource resource) {
 		var area = resource.allContents.filter(Area).next;
 		fsa.generateFile('/src/robotdefinitionsample/FXMLDocument.fxml', area.generateFxmlText);
 	}

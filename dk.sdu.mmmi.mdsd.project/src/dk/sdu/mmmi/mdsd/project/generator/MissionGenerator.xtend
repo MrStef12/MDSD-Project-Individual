@@ -51,20 +51,12 @@ import dk.sdu.mmmi.mdsd.project.dSL.Cancel
 import dk.sdu.mmmi.mdsd.project.dSL.WhenAtTrigger
 import dk.sdu.mmmi.mdsd.project.dSL.Setdown
 
-class MissionGeneratorGenerator {
+class MissionGenerator {
 	
-	private Resource resource;
-	private IFileSystemAccess2 fsa;
-	private IGeneratorContext context;
-	private CharSequence previousTaskItem;
+	CharSequence previousTaskItem;
 	
 	new (Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		this.resource = resource
-		this.fsa = fsa
-		this.context = context
-		
 		var robots = resource.allContents.filter(Robot).toList
-		
 		fsa.generateFile('/src/robotdefinitionsample/MissionGenerator.java', robots.generateMissionGenerator)
 	}
 	

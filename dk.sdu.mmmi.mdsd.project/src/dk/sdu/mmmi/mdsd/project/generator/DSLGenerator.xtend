@@ -18,14 +18,14 @@ import java.io.ByteArrayInputStream
  */
 class DSLGenerator extends AbstractGenerator {
 	
-	private static final String STATIC_FILES = 'MDSD-sample-master'
+	static final String STATIC_FILES = 'MDSD-sample-master'
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		fsa.unpackProject
 		
 		new GUIGenerator(resource, fsa, context)
 		new ControllerGenerator(resource, fsa, context)
-		new MissionGeneratorGenerator(resource, fsa, context)
+		new MissionGenerator(resource, fsa, context)
 		
 		/*
 		new InterfaceGenerator(resource, fsa, context);

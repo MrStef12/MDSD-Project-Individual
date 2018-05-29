@@ -11,15 +11,9 @@ import dk.sdu.mmmi.mdsd.project.dSL.RobotDefinition
 import dk.sdu.mmmi.mdsd.project.dSL.Pickupable
 
 class ControllerGenerator {
-	Resource resource;
-	IFileSystemAccess2 fsa;
-	IGeneratorContext context;
+
 
 	new (Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		this.resource = resource
-		this.fsa = fsa
-		this.context = context
-		
 		var rd = resource.allContents.filter(RobotDefinition).next;
 		fsa.generateFile('/src/robotdefinitionsample/FXMLDocumentController.java', rd.generateController);
 	}
