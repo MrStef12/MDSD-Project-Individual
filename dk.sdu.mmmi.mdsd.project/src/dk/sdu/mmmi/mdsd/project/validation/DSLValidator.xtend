@@ -13,6 +13,13 @@ import dk.sdu.mmmi.mdsd.project.dSL.DoTask
 import java.util.HashSet
 import dk.sdu.mmmi.mdsd.project.dSL.Task
 import java.util.Set
+import dk.sdu.mmmi.mdsd.project.dSL.Area
+import dk.sdu.mmmi.mdsd.project.dSL.AreaItem
+import dk.sdu.mmmi.mdsd.project.dSL.RobotDefinition
+import dk.sdu.mmmi.mdsd.project.dSL.StartPoint
+import dk.sdu.mmmi.mdsd.project.dSL.WhenAtPos
+import dk.sdu.mmmi.mdsd.project.dSL.Vector2
+import dk.sdu.mmmi.mdsd.project.dSL.Until
 
 /**
  * This class contains custom validation rules. 
@@ -71,4 +78,60 @@ class DSLValidator extends AbstractDSLValidator {
 			return false
 		}
 	}
+	
+	@Check
+	def checkNoNegativeAreaSize(Area area) {
+		if (area.size.x < 1 || area.size.y < 1) {
+			error('Area cannot be of size 0 or less', Literals.AREA__SIZE)
+		}
+	}
+	
+	@Check
+	def checkPickupablePos(AreaItem item) {
+		if (item.pos.checkOutsideArea) {
+			error('Item cannot be outside area boundaries', Literals.AREA_ITEM__POS)
+		}
+	}
+	
+	@Check
+	def checkRobotStartingPoint(StartPoint sp) {
+		if (sp.pos.checkOutsideArea) {
+			error('Cannot set startpoint outside of area', Literals.START_POINT__POS)
+		}
+	}
+	
+	@Check
+	def checkWhenAtUnreachablePos(WhenAtPos when) {
+		if (when.pos.checkOutsideArea) {
+			warning('Position is outside area', Literals.WHEN_AT_POS__POS)
+		}
+	}
+	
+	@Check
+	def checkWaitUntilPos(Until until) {
+		if (until.pos.checkOutsideArea) {
+			warning('Position is outside area', Literals.UNTIL__POS)
+		}
+	}
+	
+	def checkOutsideArea(Vector2 pos) {
+		var area = EcoreUtil2.getContainerOfType(pos, RobotDefinition).area
+		return pos.x > area.size.x || pos.y > area.size.y;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

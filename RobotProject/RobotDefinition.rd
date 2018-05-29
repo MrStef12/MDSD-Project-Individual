@@ -9,10 +9,6 @@ area ProductionFloor size 10 10
 		pos 2 0
 		property PhysicalWeight default 100
 	endpickupable
-	pickupable TestShelf2
-		pos 2 0
-		property PhysicalWeight default 200
-	endpickupable
 endarea
 
 task driveShelfToRight
@@ -34,11 +30,16 @@ endtask
 robot Rob1
 	startpoint 0 0
 	path
-		forward 5
+		if picked up PhysicalWeight > 100
+			forward 2
+		else
+			backward 2
+		endif
 	endpath
 	mission
 		when at pickupable TestShelf
-			do driveShelfToRight
+			wait for 2 seconds
+			forward 2
 		end
 	endmission
 endrobot
