@@ -28,11 +28,7 @@ import dk.sdu.mmmi.mdsd.project.dSL.Until
  */
 class DSLValidator extends AbstractDSLValidator {
 	
-
-	public static val INVALID_NAME = 'Another shelf with the same name already exists';
-	public static val INVALID_TERMINATABLE = "Two terminatables handlers can't have the same name";
-	
-	@Check(FAST)
+	@Check
 	def checkNames(Pickupable s) {
 		val container = EcoreUtil2.getRootContainer(s);
 		val cand = EcoreUtil2.getAllContentsOfType(container, Pickupable);
@@ -41,7 +37,7 @@ class DSLValidator extends AbstractDSLValidator {
 			
 			if (s != myS) {
 				if (s.name.equals(myS.name)) {
-					error(INVALID_NAME,  Literals.AREA_ITEM__NAME);
+					error('Another shelf with the same name already exists',  Literals.AREA_ITEM__NAME);
 				}
 			}
 
