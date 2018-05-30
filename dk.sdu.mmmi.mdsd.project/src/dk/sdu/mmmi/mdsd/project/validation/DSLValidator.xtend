@@ -29,18 +29,36 @@ import dk.sdu.mmmi.mdsd.project.dSL.Until
 class DSLValidator extends AbstractDSLValidator {
 	
 	@Check
-	def checkNames(Pickupable s) {
+	def checkPickupableNames(Pickupable s) {
 		val container = EcoreUtil2.getRootContainer(s);
 		val cand = EcoreUtil2.getAllContentsOfType(container, Pickupable);
 		
 		for (Pickupable myS : cand) {
-			
 			if (s != myS) {
 				if (s.name.equals(myS.name)) {
 					error('Another shelf with the same name already exists',  Literals.AREA_ITEM__NAME);
 				}
 			}
-
+		}
+	}
+	
+	@Check
+	def checkTaskNames(Task task) {
+		var allTasks = EcoreUtil2.getContainerOfType(task, RobotDefinition).tasks
+		for (t : allTasks) {
+			if (t != task && t.name.equals(task.name)) {
+				error('Another task with the same name already exists', Literals.TASK__NAME)
+			}
+		} 
+	}
+	
+	@Check
+	def checkRobotNames(Robot robot) {
+		var allRobots = EcoreUtil2.getContainerOfType(robot, RobotDefinition).robots
+		for (r : allRobots) {
+			if (r != robot && r.name.equals(robot.name)) {
+				error('Another robot with the same name already exists', Literals.ROBOT__NAME)
+			}
 		}
 	}
 	
@@ -83,7 +101,7 @@ class DSLValidator extends AbstractDSLValidator {
 	}
 	
 	@Check
-	def checkPickupablePos(AreaItem item) {
+	def checkAreaItemPos(AreaItem item) {
 		if (item.pos.checkOutsideArea) {
 			error('Item cannot be outside area boundaries', Literals.AREA_ITEM__POS)
 		}
